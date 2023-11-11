@@ -1,0 +1,39 @@
+<!-- habits/templates/habits/goal.html -->
+
+{% extends 'website/base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>Traguardi</h1>
+
+    <!-- Visualizzazione dei traguardi -->
+    <ul>
+        {% for goal in goals %}
+            <li>
+                {{ goal.description }}
+                <button type="button" class="btn btn-link" data-toggle="collapse" data-target="#editForm-{{ goal.id }}">Modifica</button>
+                <div id="editForm-{{ goal.id }}" class="collapse">
+                    <h2>Modifica Traguardo</h2>
+                    <form action="{% url 'habits:edit_goal' goal.id %}" method="post">
+                        {% csrf_token %}
+                        {{ edit_goal_form.as_p }}
+                        <button type="submit" class="btn btn-primary">Salva Modifiche</button>
+                    </form>
+                </div>
+                <form action="{% url 'habits:delete_goal' goal.id %}" method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Elimina</button>
+                </form>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <!-- Form per la creazione di un nuovo traguardo -->
+    <h2>Crea Nuovo Traguardo</h2>
+    <form action="{% url 'habits:create_goal' %}" method="post">
+        {% csrf_token %}
+        {{ create_goal_form.as_p }}
+        <button type="submit" class="btn btn-success">Crea</button>
+    </form>
+</div>
+{% endblock %}

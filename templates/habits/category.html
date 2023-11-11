@@ -1,0 +1,47 @@
+<!-- habits/templates/habits/category.html -->
+
+{% extends 'website/base.html' %}
+
+{% block title %}Categories{% endblock title %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex flex-row justify-content-around">
+        <h1>Categories</h1>
+        <a href="{% url 'habits:overview' %}" class="btn btn-outline-primary m-2">< Overview</a>
+    </div>
+    <!-- Visualizzazione delle categorie -->
+    <ul>
+        {% for category, edit_category_form in category_form_dict.items %}
+            <li class="d-flex flex-row justify-content-around">
+                
+                <span class="mx-2 flex-grow-1 fs-3 bold">{{ category.name }}</span>
+                <div class="m-2" style="width:30px; background-color:{{category.color}};"></div>
+                <button type="button" class="m-1 btn btn-outline-primary" data-bs-toggle="collapse" data-bs-target="#editForm-{{ category.id }}">Modify</button>
+                
+                <form action="{% url 'habits:delete_category' category.id %}" method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="m-1 btn btn-danger">Delete</button>
+                </form>
+            </li>
+            <div id="editForm-{{ category.id }}" class="collapse">
+                    <h6>Modify Category</h6>
+                    <form action="{% url 'habits:edit_category' category.id %}" method="post">
+                        {% csrf_token %}
+                        {{ edit_category_form.as_p }} {# Utilizzo il form di modifica corrispondente alla categoria #}
+                        <button type="submit" class="m-1 btn btn-outline-primary">Save</button>
+                    </form>
+                </div>
+            <hr class="my-1">
+        {% endfor %}
+        
+    </ul>
+    <!-- Form per la creazione di una nuova categoria -->
+    <h4>Create new category</h4>
+    <form action="{% url 'habits:create_category' %}" method="post">
+        {% csrf_token %}
+        {{ category_form.as_p }}
+        <button type="submit" class="btn btn-outline-success">Create</button>
+    </form>
+</div>
+{% endblock %}

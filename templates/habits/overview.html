@@ -1,0 +1,16 @@
+<!-- habits/templates/habits/overview.html -->
+
+{% extends 'website/base.html' %}
+
+
+{% block title %}Overview{% endblock title %}
+
+{% block content %}
+    <div class="container">
+        <h1>Overview</h1>
+        <a href="{% url 'habits:category' %}">category</a>
+        <a href="{% url 'habits:habit' %}">habit</a>
+        <a href="{% url 'habits:goal' %}">goal</a>
+        <a href="{% url 'habits:habit_event' %}">habit_event</a>
+    </div> 
+{% endblock %}
