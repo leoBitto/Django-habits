@@ -20,18 +20,6 @@ class Habit(models.Model):
         return self.name
     
 
-# class Goal(models.Model):
-#     target = models.IntegerField()  # Numero di volte che si vuole praticare l'abitudine al mese
-#     description = models.TextField(null=True, blank=True)
-#     start_date = models.DateField()
-#     end_date = models.DateField(null=True, blank=True)
-#     completed = models.BooleanField(default=False)  # Indica se l'abitudine è stata completata
-#     habit = models.OneToOneField(Habit, on_delete=models.CASCADE, null=True, blank=True, related_name='goal')
-
-#     def __str__(self):
-#         return f"Goal per {self.habit.name} ({self.start_date} - {self.end_date})"
-
-
 class HabitEvent(models.Model):
     habit = models.ForeignKey(Habit, on_delete=models.CASCADE)
     date = models.DateField()

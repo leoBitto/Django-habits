@@ -20,9 +20,6 @@ urlpatterns = [
     path('habits/<int:habit_id>/edit/', views.edit_habit, name='edit_habit'),
     path('habits/<int:habit_id>/delete/', views.delete_habit, name='delete_habit'),
 
-    # Gestione dei traguardi
-    #path('goals/', views.goal, name='goal'),
-
     # Gestione degli eventi
     path('habit_events/', views.habit_event, name='habit_event'),
     path('habit_events/create/', views.create_habit_event, name='create_habit_event'),

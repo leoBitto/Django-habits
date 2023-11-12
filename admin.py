@@ -9,9 +9,6 @@ class CategoryAdmin(admin.ModelAdmin):
 class HabitAdmin(admin.ModelAdmin):
     list_display = ('name', 'category')
 
-# @admin.register(Goal)
-# class GoalAdmin(admin.ModelAdmin):
-#     list_display = ('habit', 'target', 'description','completed', 'start_date', 'end_date')
 
 @admin.register(HabitEvent)
 class HabitEventAdmin(admin.ModelAdmin):

@@ -2,15 +2,13 @@
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
-from .models import Category, Habit, HabitEvent#, Goal
+from .models import Category, Habit, HabitEvent
 from .forms import *
 
 def overview(request):
     categories = Category.objects.all()
     habits = Habit.objects.all()
     habit_events= HabitEvent.objects.all()
-    #goals = Goal.objects.all()
-
 
 
     context={
@@ -82,7 +80,6 @@ def habit(request):
     habits = Habit.objects.all()
 
     habit_form = HabitForm()
-    #goal_form = GoalForm()
     habit_form_dict = {}
 
     for habit in habits:
@@ -92,7 +89,6 @@ def habit(request):
     context = {
         'habits': habits,
         'habit_form': habit_form,
-        #'goal_form' : goal_form,
         'habit_form_dict': habit_form_dict,
     }
 
@@ -102,8 +98,6 @@ def habit(request):
 def create_habit(request):
     if request.method == 'POST':
         habit_form = HabitForm(request.POST)
-        #goal_form = GoalForm(request.POST)
-
         habits = Habit.objects.all()
         habit_form_dict = {}
 
@@ -114,15 +108,12 @@ def create_habit(request):
         context = {
             'habits': habits,
             'habit_form': habit_form,
-            #'goal_form': goal_form,
             'habit_form_dict': habit_form_dict,
         }
 
-        if habit_form.is_valid():# and goal_form.is_valid():
+        if habit_form.is_valid():
             habit = habit_form.save()  # Salva l'abitudine
-            # goal = goal_form.save(commit=False)  # Salva il Goal, ma non lo invia al database ancora
-            # goal.habit = habit  # Associa il Goal all'abitudine appena creata
-            # goal.save()  # Ora salva il Goal con l'abitudine associata
+
 
             return redirect('habits:habit')  # Redirect alla lista delle abitudini o ad altra pagina desiderata
     
@@ -147,18 +138,6 @@ def delete_habit(request, habit_id):
         habit.delete()
 
     return redirect('habits:habit')
-
-
-# # goal views
-# def goal(request):
-#     goals = Goal.objects.all()
-
-
-#     context = {
-#         'goals': goals,
-#     }
-
-#     return render(request, 'habits/goal.html', context)
 
 
 # habit event views
