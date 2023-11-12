@@ -10,7 +10,7 @@
         <h1>Overview</h1>
         <a href="{% url 'habits:category' %}">category</a>
         <a href="{% url 'habits:habit' %}">habit</a>
-        <a href="{% url 'habits:goal' %}">goal</a>
+        {% comment %} <a href="{% url 'habits:goal' %}">goal</a> {% endcomment %}
         <a href="{% url 'habits:habit_event' %}">habit_event</a>
     </div> 
 {% endblock %}

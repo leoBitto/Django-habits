@@ -2,38 +2,32 @@
 
 {% extends 'website/base.html' %}
 
+{% block title %}Goals{% endblock title %}
+
 {% block content %}
 <div class="container">
-    <h1>Traguardi</h1>
-
-    <!-- Visualizzazione dei traguardi -->
-    <ul>
-        {% for goal in goals %}
-            <li>
-                {{ goal.description }}
-                <button type="button" class="btn btn-link" data-toggle="collapse" data-target="#editForm-{{ goal.id }}">Modifica</button>
-                <div id="editForm-{{ goal.id }}" class="collapse">
-                    <h2>Modifica Traguardo</h2>
-                    <form action="{% url 'habits:edit_goal' goal.id %}" method="post">
-                        {% csrf_token %}
-                        {{ edit_goal_form.as_p }}
-                        <button type="submit" class="btn btn-primary">Salva Modifiche</button>
-                    </form>
-                </div>
+    <div class="d-flex flex-row justify-content-around">
+        <h1>Goals</h1>
+        <a href="{% url 'habits:overview' %}" class="btn btn-outline-primary m-2">< Overview</a>
+    </div>
+    <!-- Visualizzazione degli obiettivi -->
+    <ul class="my-5">
+        {% for goal, edit_goal_form in goal_form_dict.items %}
+            <li class="d-flex flex-row justify-content-around">
+                <span class="mx-2 flex-grow-1 fs-3 bold">{{ goal.habit }}</span>
+                <span class="mx-2 flex-grow-1 fs-3 bold">{{ goal.description|truncatechars_html:25 }}</span>
+                <span class="mx-2 flex-grow-1 fs-3 bold">{{ goal.start_date }}</span>
+                <span class="mx-2 flex-grow-1 fs-3 bold">{{ goal.end_date }}</span>
+                <button type="button" class="m-1 btn btn-outline-primary" data-bs-toggle="collapse" data-bs-target="#editForm-{{ goal.id }}">Modify</button>
+                
                 <form action="{% url 'habits:delete_goal' goal.id %}" method="post" style="display:inline;">
                     {% csrf_token %}
-                    <button type="submit" class="btn btn-danger">Elimina</button>
+                    <button type="submit" class="m-1 btn btn-danger">Delete</button>
                 </form>
             </li>
+            <hr class="my-1">
         {% endfor %}
+        
     </ul>
-
-    <!-- Form per la creazione di un nuovo traguardo -->
-    <h2>Crea Nuovo Traguardo</h2>
-    <form action="{% url 'habits:create_goal' %}" method="post">
-        {% csrf_token %}
-        {{ create_goal_form.as_p }}
-        <button type="submit" class="btn btn-success">Crea</button>
-    </form>
 </div>
 {% endblock %}

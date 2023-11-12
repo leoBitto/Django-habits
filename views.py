@@ -2,14 +2,14 @@
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
-from .models import Category, Habit, HabitEvent, Goal
+from .models import Category, Habit, HabitEvent#, Goal
 from .forms import *
 
 def overview(request):
     categories = Category.objects.all()
     habits = Habit.objects.all()
     habit_events= HabitEvent.objects.all()
-    goals = Goal.objects.all()
+    #goals = Goal.objects.all()
 
 
 
@@ -47,10 +47,12 @@ def create_category(request):
         if form.is_valid():
             name = form.cleaned_data['name']
             color = form.cleaned_data['color']
+            icon = form.cleaned_data['icon']
 
         Category.objects.create(
             name=name,
             color=color,
+            icon=icon
         )
     return redirect('habits:category')
 
@@ -80,6 +82,7 @@ def habit(request):
     habits = Habit.objects.all()
 
     habit_form = HabitForm()
+    #goal_form = GoalForm()
     habit_form_dict = {}
 
     for habit in habits:
@@ -89,26 +92,43 @@ def habit(request):
     context = {
         'habits': habits,
         'habit_form': habit_form,
+        #'goal_form' : goal_form,
         'habit_form_dict': habit_form_dict,
     }
 
     return render(request, 'habits/habit.html', context)
 
+
 def create_habit(request):
     if request.method == 'POST':
-        form = HabitForm(request.POST)
-        
-        if form.is_valid():
-            name = form.cleaned_data['name']
-            category = form.cleaned_data['category']
-            icon = form.cleaned_data['icon']
+        habit_form = HabitForm(request.POST)
+        #goal_form = GoalForm(request.POST)
 
-            Habit.objects.create(
-                name=name,
-                category=category,
-                icon=icon
-            )
-    return redirect('habits:habit')
+        habits = Habit.objects.all()
+        habit_form_dict = {}
+
+        for habit in habits:
+            edit_habit_form = HabitForm(instance=habit)
+            habit_form_dict[habit] = edit_habit_form
+
+        context = {
+            'habits': habits,
+            'habit_form': habit_form,
+            #'goal_form': goal_form,
+            'habit_form_dict': habit_form_dict,
+        }
+
+        if habit_form.is_valid():# and goal_form.is_valid():
+            habit = habit_form.save()  # Salva l'abitudine
+            # goal = goal_form.save(commit=False)  # Salva il Goal, ma non lo invia al database ancora
+            # goal.habit = habit  # Associa il Goal all'abitudine appena creata
+            # goal.save()  # Ora salva il Goal con l'abitudine associata
+
+            return redirect('habits:habit')  # Redirect alla lista delle abitudini o ad altra pagina desiderata
+    
+    # Se il form non è valido, aggiungi il form come contesto e lascia che il template gestisca gli errori
+    return render(request, 'habits/habit.html', context)
+
 
 def edit_habit(request, habit_id):
     habit = get_object_or_404(Habit, pk=habit_id)  
@@ -129,40 +149,74 @@ def delete_habit(request, habit_id):
     return redirect('habits:habit')
 
 
-# goal views
+# # goal views
+# def goal(request):
+#     goals = Goal.objects.all()
 
-def goal(request):
 
-    context={
-        
-    }
+#     context = {
+#         'goals': goals,
+#     }
 
-    return render(request, 'habits/goal.html', context) 
+#     return render(request, 'habits/goal.html', context)
 
-def create_goal(request):
-    pass
-
-def edit_goal(request):
-    pass
-
-def delete_goal(request):
-    pass
 
 # habit event views
 
 def habit_event(request):
+    habit_events = HabitEvent.objects.all()
 
-    context={
-    
+    habit_event_form = HabitEventForm()
+    habit_event_form_dict = {}
+
+    for habit_event in habit_events:
+        edit_habit_event_form = HabitEventForm(instance=habit_event)
+        habit_event_form_dict[habit_event] = edit_habit_event_form
+
+    context = {
+        'habit_events': habit_events,
+        'habit_event_form': habit_event_form,
+        'habit_event_form_dict': habit_event_form_dict,
     }
 
-    return render(request, 'habits/habit_event.html', context) 
+    return render(request, 'habits/habit_event.html', context)
+
 
 def create_habit_event(request):
-    pass
+    if request.method == 'POST':
+        form = HabitEventForm(request.POST)
+        
+        if form.is_valid():
+            habit = form.cleaned_data['habit']
+            date = form.cleaned_data['date']
+            time = form.cleaned_data['time']
+            location = form.cleaned_data['location']
 
-def edit_habit_event(request):
-    pass
+            HabitEvent.objects.create(
+                habit=habit,
+                date=date,
+                time=time,
+                location=location,
+            )
+            
+    return redirect('habits:habit_event')
 
-def delete_habit_event(request):
-    pass
+
+def edit_habit_event(request, habit_event_id):
+    habit_event = get_object_or_404(HabitEvent, pk=habit_event_id)  
+    if request.method == 'POST':
+        form = HabitEventForm(request.POST, instance=habit_event)  
+        if form.is_valid():
+            form.save()  
+            return redirect('habits:habit_event')
+    else:
+        form = HabitEventForm(instance=habit_event)
+    return redirect('habits:habit_event')
+
+
+def delete_habit_event(request, habit_event_id):
+    if request.method == 'POST':
+        habit_event = get_object_or_404(HabitEvent, id=habit_event_id)
+        habit_event.delete()
+
+    return redirect('habits:habit_event')

@@ -8,7 +8,7 @@
 <div class="container">
     <div class="d-flex flex-row justify-content-around">
         <h1>Habits</h1>
-        <a href="{% url 'habits:overview' %}" class="btn btn-outline-primary m-2">Overview</a>
+        <a href="{% url 'habits:overview' %}" class="btn btn-outline-primary m-2">< Overview</a>
     </div>
     <!-- Visualizzazione delle abitudini -->
     <ul>
@@ -41,6 +41,10 @@
     <form action="{% url 'habits:create_habit' %}" method="post">
         {% csrf_token %}
         {{ habit_form.as_p }}
+{% comment %} 
+        <h5> Set a goal </h5>
+
+        {{ goal_form.as_p }} {% endcomment %}
         <button type="submit" class="btn btn-outline-success">Create</button>
     </form>
 </div>
