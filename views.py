@@ -1,21 +1,47 @@
 # habits/views.py
 
 from django.shortcuts import render, redirect, get_object_or_404
-from django.utils import timezone
 from .models import Category, Habit, HabitEvent
 from .forms import *
 
+from django.db.models import Count, Avg
+from plotly.offline import plot
+import plotly.graph_objs as go
+from .models import Habit, HabitEvent
+
 def overview(request):
+    # Calcola le statistiche
+    total_habits = Habit.objects.count()
+    total_events = HabitEvent.objects.count()
+    
+    # Media di eventi per abitudine
+    avg_events_per_habit = HabitEvent.objects.values('habit__name').annotate(avg_events=Avg('id'))
+
+
+    # Crea un istogramma per la media di eventi per abitudine
+    habit_names = [item['habit__name'] for item in avg_events_per_habit]
+    avg_events = [item['avg_events'] for item in avg_events_per_habit]
+    habit_bar = go.Bar(x=habit_names, y=avg_events, name='Media Eventi per Abitudine')
+
+    # Crea un grafico a torta per le categorie
     categories = Category.objects.all()
-    habits = Habit.objects.all()
-    habit_events= HabitEvent.objects.all()
+    category_pie = go.Pie(labels=[category.name for category in categories], values=[category.habit_set.count() for category in categories], name='Categorie')
 
+    # Rendi i grafici Plotly in HTML
+    habit_bar_chart = plot([habit_bar], output_type='div')
+    category_pie_chart = plot([category_pie], output_type='div')
 
-    context={
-        
+    # Creazione del contesto per il template
+    context = {
+        'total_habits': total_habits,
+        'total_events': total_events,
+        'avg_events_per_habit_chart': habit_bar_chart,
+        'category_pie_chart': category_pie_chart,
     }
 
-    return render(request, 'habits/overview.html', context) 
+    # Renderizza il template 'habits/overview.html' con il contesto creato
+    return render(request, 'habits/overview.html', context)
+
 
 # category views
 

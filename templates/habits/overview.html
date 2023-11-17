@@ -2,15 +2,41 @@
 
 {% extends 'website/base.html' %}
 
-
 {% block title %}Overview{% endblock title %}
 
 {% block content %}
     <div class="container">
         <h1>Overview</h1>
-        <a href="{% url 'habits:category' %}">category</a>
-        <a href="{% url 'habits:habit' %}">habit</a>
-        {% comment %} <a href="{% url 'habits:goal' %}">goal</a> {% endcomment %}
-        <a href="{% url 'habits:habit_event' %}">habit_event</a>
-    </div> 
+        
+        <div class="row mt-3">
+            <div class="col-md-6">
+                <h2>Total Habits: {{ total_habits }}</h2>
+                <!-- Aggiungi qui altri dettagli o grafici se necessario -->
+            </div>
+            <div class="col-md-6">
+                <h2>Total Events: {{ total_events }}</h2>
+                <!-- Aggiungi qui altri dettagli o grafici se necessario -->
+            </div>
+        </div>
+
+        <div class="row mt-3">
+            <div class="col-md-6">
+                <h2>Average Events per Habit</h2>
+                <!-- Includi il grafico Plotly per la media di eventi per abitudine -->
+                {{ avg_events_per_habit_chart | safe }}
+            </div>
+            <div class="col-md-6">
+                <h2>Categories</h2>
+                <!-- Includi il grafico Plotly per le categorie -->
+                {{ category_pie_chart | safe }}
+            </div>
+        </div>
+        
+        <div class="mt-5">
+            <h2>Links to Other Pages</h2>
+            <a href="{% url 'habits:category' %}">Category Page</a>
+            <a href="{% url 'habits:habit' %}">Habit Page</a>
+            <a href="{% url 'habits:habit_event' %}">Habit Event Page</a>
+        </div>
+    </div>
 {% endblock %}

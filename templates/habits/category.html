@@ -5,43 +5,48 @@
 {% block title %}Categories{% endblock title %}
 
 {% block content %}
-<div class="container">
-    <div class="d-flex flex-row justify-content-around">
-        <h1>Categories</h1>
-        <a href="{% url 'habits:overview' %}" class="btn btn-outline-primary m-2">< Overview</a>
+<div class="container p-4">
+    <div class="d-flex flex-row justify-content-between align-items-center p-3">
+        <h1 class="fs-4">Categories</h1>
+        <a href="{% url 'habits:overview' %}" class="btn btn-outline-primary btn-sm">< Overview</a>
     </div>
     <!-- Visualizzazione delle categorie -->
-    <ul>
+    <ul class="list-group p-2">
         {% for category, edit_category_form in category_form_dict.items %}
-            <li class="d-flex flex-row justify-content-around">
-                
-                <span class="mx-2 flex-grow-1 fs-3 bold">{{ category.name }}</span>
-                <div class="m-2" style="width:30px; background-color:{{category.color}};"></div>
-                <button type="button" class="m-1 btn btn-outline-primary" data-bs-toggle="collapse" data-bs-target="#editForm-{{ category.id }}">Modify</button>
-                
-                <form action="{% url 'habits:delete_category' category.id %}" method="post" style="display:inline;">
-                    {% csrf_token %}
-                    <button type="submit" class="m-1 btn btn-danger">Delete</button>
-                </form>
-            </li>
-            <div id="editForm-{{ category.id }}" class="collapse">
-                    <h6>Modify Category</h6>
-                    <form action="{% url 'habits:edit_category' category.id %}" method="post">
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div class="row">
+                    <i class="col mt-2 {{ category.icon }}"></i>
+                    <span class="col fs-5">{{ category.name }}</span>
+                    <span class="col ms-2" style="width:30px; height: 30px; background-color:{{category.color}}; display: inline-block;"></span>
+                </div>
+                <div class="d-flex">
+                    <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="collapse" data-bs-target="#editForm-{{ category.id }}">Modify</button>
+                    <form action="{% url 'habits:delete_category' category.id %}" method="post" class="ms-2">
                         {% csrf_token %}
-                        {{ edit_category_form.as_p }} {# Utilizzo il form di modifica corrispondente alla categoria #}
-                        <button type="submit" class="m-1 btn btn-outline-primary">Save</button>
+                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                     </form>
                 </div>
-            <hr class="my-1">
+            </li>
+            <div id="editForm-{{ category.id }}" class="collapse mt-2">
+                <h6>Modify Category</h6>
+                <form action="{% url 'habits:edit_category' category.id %}" method="post">
+                    {% csrf_token %}
+                    {{ edit_category_form.as_p }} {# Utilizzo il form di modifica corrispondente alla categoria #}
+                    <button type="submit" class="btn btn-outline-primary btn-sm">Save</button>
+                </form>
+            </div>
         {% endfor %}
-        
     </ul>
     <!-- Form per la creazione di una nuova categoria -->
-    <h4>Create new category</h4>
-    <form action="{% url 'habits:create_category' %}" method="post">
-        {% csrf_token %}
-        {{ category_form.as_p }}
-        <button type="submit" class="btn btn-outline-success">Create</button>
-    </form>
+
+    <div class="d-flex justify-content-center flex-column m-3 mt-5 p-3 bg-light rounded">
+        <h4 class="fs-5 mb-3">Create new category</h4>
+        <form action="{% url 'habits:create_category' %}" method="post">
+            {% csrf_token %}
+            {{ category_form.as_p }}
+            <button type="submit" class="btn btn-outline-success btn-sm mx-auto d-block">Create</button>
+        </form>
+    </div>
+
 </div>
 {% endblock %}
