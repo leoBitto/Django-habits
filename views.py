@@ -158,6 +158,7 @@ def edit_habit(request, habit_id):
         form = HabitForm(instance=habit)
     return redirect('habits:habit')
 
+
 def delete_habit(request, habit_id):
     if request.method == 'POST':
         habit = get_object_or_404(Habit, id=habit_id)
