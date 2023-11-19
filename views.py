@@ -108,14 +108,22 @@ def habit(request):
     habit_form = HabitForm()
     habit_form_dict = {}
 
+    grouped_habits = {}
     for habit in habits:
+        category = habit.category
+        if category not in grouped_habits:
+            grouped_habits[category] = []
+
         edit_habit_form = HabitForm(instance=habit)
-        habit_form_dict[habit] = edit_habit_form
+        habit_form_dict = {'habit': habit, 'form': edit_habit_form}
+        grouped_habits[category].append(habit_form_dict)
+
 
     context = {
         'habits': habits,
         'habit_form': habit_form,
         'habit_form_dict': habit_form_dict,
+        'grouped_habits': grouped_habits,
     }
 
     return render(request, 'habits/habit.html', context)
@@ -175,14 +183,22 @@ def habit_event(request):
     habit_event_form = HabitEventForm()
     habit_event_form_dict = {}
 
+    grouped_habit_events = {}
     for habit_event in habit_events:
+        category = habit_event.habit.category
+        if category not in grouped_habit_events:
+            grouped_habit_events[category] = []
+
         edit_habit_event_form = HabitEventForm(instance=habit_event)
-        habit_event_form_dict[habit_event] = edit_habit_event_form
+        habit_event_form_dict = {'habit': habit_event, 'form': edit_habit_event_form}
+        grouped_habit_events[category].append(habit_event_form_dict)
+
 
     context = {
         'habit_events': habit_events,
         'habit_event_form': habit_event_form,
         'habit_event_form_dict': habit_event_form_dict,
+        'grouped_habit_events': grouped_habit_events,
     }
 
     return render(request, 'habits/habit_event.html', context)

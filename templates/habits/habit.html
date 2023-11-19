@@ -1,5 +1,4 @@
 <!-- habits/templates/habits/habit.html -->
-
 {% extends 'website/base.html' %}
 
 {% block title %}Habits{% endblock title %}
@@ -8,34 +7,39 @@
 <div class="container p-4">
     <div class="d-flex flex-row justify-content-around py-3">
         <h1 class="fs-4">Habits</h1>
-        <a href="{% url 'habits:overview' %}" class="btn btn-outline-primary btn-sm">< Overview</a>
+        <a href="{% url 'habits:overview' %}" class="btn btn-outline-primary btn-sm mt-1">< Overview</a>
     </div>
     <!-- Visualizzazione delle abitudini -->
+
     <ul class="list-group p-2">
-        {% for habit, edit_habit_form in habit_form_dict.items %}
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-                <div class="row">
-                    <span class="col fs-5">{{ habit.name }}</span>
-                    <span class="col fs-6 mt-1">{{ habit.category }}</span>
-                </div>
-                <div class="d-flex">
-                    <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="collapse" data-bs-target="#editForm-{{ habit.id }}">Modify</button>
-                    <form action="{% url 'habits:delete_habit' habit.id %}" method="post" class="ms-2">
+        {% for category, habit_form_dict_list in grouped_habits.items %}
+        <h6 class="m-2">{{ category }}</h6>
+            {% for habit_form_dict in habit_form_dict_list %}
+                <li class="m-1 list-group-item d-flex justify-content-between align-items-center">
+                    <div class="row">
+                        <span class="col fs-5">{{ habit_form_dict.habit.name }}</span>
+                        {#<span class="col fs-6 mt-1">{{ habit_form_dict.habit.category }}</span>#}
+                    </div>
+                    <div class="d-flex">
+                        <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="collapse" data-bs-target="#editForm-{{ habit_form_dict.habit.id }}">Modify</button>
+                        <form action="{% url 'habits:delete_habit' habit_form_dict.habit.id %}" method="post" class="ms-2">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                        </form>
+                    </div>
+                </li>
+                <div id="editForm-{{ habit_form_dict.habit.id }}" class="collapse mt-2">
+                    <h6>Modify Habit</h6>
+                    <form action="{% url 'habits:edit_habit' habit_form_dict.habit.id %}" method="post">
                         {% csrf_token %}
-                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                        {{ habit_form_dict.form.as_p }} {# Utilizzo il form di modifica corrispondente all'abitudine #}
+                        <button type="submit" class="btn btn-outline-primary btn-sm mx-auto d-block">Save</button>
                     </form>
                 </div>
-            </li>
-            <div id="editForm-{{ habit.id }}" class="collapse mt-2">
-                <h6>Modify Habit</h6>
-                <form action="{% url 'habits:edit_habit' habit.id %}" method="post">
-                    {% csrf_token %}
-                    {{ edit_habit_form.as_p }} {# Utilizzo il form di modifica corrispondente all'abitudine #}
-                    <button type="submit" class="btn btn-outline-primary btn-sm mx-auto d-block">Save</button>
-                </form>
-            </div>
+            {% endfor %}
         {% endfor %}
     </ul>
+    
     <!-- Form per la creazione di una nuova abitudine -->
     <div class="d-flex justify-content-center flex-column m-3 mt-5 p-3 bg-light rounded">
         <h4 class="fs-5">Create new habit</h4>
