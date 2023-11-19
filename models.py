@@ -32,17 +32,3 @@ class HabitEvent(models.Model):
         return f"{self.habit.name} il {self.date}"
 
 
-class HabitGoal(models.Model):
-    FREQUENCY_CHOICES = [
-        ('daily', 'Daily'),
-        ('weekly', 'Weekly'),
-        ('monthly', 'Monthly'),
-        # Aggiungi altre opzioni se necessario
-    ]
-
-    habit = models.OneToOneField(Habit, on_delete=models.CASCADE)
-    description = models.CharField(max_length=255, blank=True, null=True)
-    target = models.PositiveIntegerField()
-    frequency = models.CharField(max_length=20, choices=FREQUENCY_CHOICES)
-    start_date = models.DateField()
-    end_date = models.DateField()
