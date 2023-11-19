@@ -16,9 +16,9 @@
         <h6 class="m-2">{{ category }}</h6>
             {% for habit_form_dict in habit_form_dict_list %}
                 <li class="m-1 list-group-item d-flex justify-content-between align-items-center">
-                    <div class="row">
-                        <span class="col fs-5">{{ habit_form_dict.habit.name }}</span>
-                        {#<span class="col fs-6 mt-1">{{ habit_form_dict.habit.category }}</span>#}
+                    <div class="d-flex flex-row">
+                        <span class="fs-5">{{ habit_form_dict.habit.name }}</span>
+                        <i class="mx-3 mt-1 {{ habit_form_dict.habit.category.icon }}"></i>
                     </div>
                     <div class="d-flex">
                         <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="collapse" data-bs-target="#editForm-{{ habit_form_dict.habit.id }}">Modify</button>
