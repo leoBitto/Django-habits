@@ -12,10 +12,10 @@
             <div class="container-fluid d-flex justify-content-around">
                 <ul class="navbar-nav flex-row d-flex justify-content-around">
                     <li class="nav-item">
-                        <a class="navbar-brand" href="{% url 'habits:category' %}">Category</a>
+                        <a class="navbar-brand" href="{% url 'habits:category' %}">Category | </a>
                     </li>
                     <li class="nav-item">
-                        <a class="navbar-brand" href="{% url 'habits:habit' %}">Habit</a>
+                        <a class="navbar-brand" href="{% url 'habits:habit' %}">Habit | </a>
                     </li>
                     <li class="nav-item">
                         <a class="navbar-brand" href="{% url 'habits:habit_event' %}">Habit Event</a>
@@ -26,25 +26,44 @@
 
         {% include "habits/habit_event_form.html" %}
 
-        <div class="row mt-3">
-            <div class="col-md-6">
-                <h2>Categories</h2>
-                {% for category in categories%}
-                <div class="card" style="width: 18rem;">
-                    <div class="card-body d-flex flex-row justify-content-around">
-                        <i class="col mt-2 {{ category.icon }}"></i>
-                        <span class="col fs-5">{{ category.name }}</span>
-                        <span class="col ms-2" style="width:120px; height: 30px; background-color:{{category.color}}; display: inline-block;"></span>
+        <div class="d-flex flex-column flex-md-row mt-3">
+            <div class="col-md-6 col-12 m-2">
+                <h2 class="my-1">Categories</h2>
+                <div class="accordion mb-5 p-4" id="accordionCategory">
+                    {% for category, habits in categories_and_habits.items %}
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="heading{{category.id}}">
+                            <button class="accordion-button d-flex justify-content-around" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{category.id}}" aria-expanded="true" aria-controls="collapse{{category.id}}">
+                                <i class="col mt-2 {{ category.icon }}"></i>
+                                <span class="col fs-5">{{ category.name }}</span>
+                                <span class="col ms-2" style="width:120px; height: 30px; background-color:{{category.color}}; display: inline-block;"></span>
+                            </button>
+                        </h2>
+                        {% for habit in habits%}
+                        <div id="collapse{{category.id}}" class="accordion-collapse collapse " aria-labelledby="heading{{category.id}}" data-bs-parent="#accordionCategory">
+                            <div class="accordion-body d-flex justify-content-around">
+                                <span class="col fs-5">{{ habit.name }}</span>
+                                <button 
+                                class="btn btn-primary" 
+                                hx-target="#graphContainer" 
+                                hx-swap="innerHTML" 
+                                hx-trigger="click"
+                                data-hx-get="{% url 'habits:show_graph' habit.id %}">
+                                Show Graph
+                                </button>
+                            </div>
+                        </div>
+                        {% endfor %}
                     </div>
+                    {% endfor %}
                 </div>
-                {% endfor %}
             </div>
-            <div class="col-md-6">
-                <h2>line chart</h2>
-                <p> 
-                    click the category on the left, to show the various habits linked to the category in the last week
-                    it show the frequency each day of every habit of the category.
-                </p>
+
+            <div class="col-md-6 col-12 m-2">
+                <h2 class="my-1">Line Chart</h2>
+                <div id="graphContainer" class="" >
+                    {{ graph | safe }}
+                </div>                
             </div>
         </div>
 

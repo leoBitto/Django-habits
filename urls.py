@@ -7,6 +7,7 @@ app_name = 'habits'
 urlpatterns = [
     # Visualizzazione del overviews
     path('overview/', views.overview, name='overview'),
+    path('show_graph/<int:habit_id>', views.show_graph, name="show_graph"),
 
     # Gestione delle categorie
     path('categories/', views.category, name='category'),

@@ -25,7 +25,7 @@ class HabitForm(forms.ModelForm):
 class HabitEventForm(forms.ModelForm):
     class Meta:
         model = HabitEvent
-        fields = ['habit', 'date', 'time', 'location']
+        fields = ['habit', 'date', 'time', 'location', 'value', 'value_type']
 
         widgets = {
             'date': forms.DateInput(attrs={'type': 'date'}),

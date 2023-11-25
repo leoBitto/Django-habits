@@ -22,11 +22,19 @@ class Habit(models.Model):
     
 
 class HabitEvent(models.Model):
+
+    CHOICHES=[
+        ('minutes','minutes'),
+        ('repetition','repetition'),
+        ('quantity','quantity'),
+    ]
+
     habit = models.ForeignKey(Habit, on_delete=models.CASCADE)
     date = models.DateField()
     time = models.TimeField(null=True, blank=True)  # Campo per l'ora, può essere opzionale
     location = models.CharField(max_length=100, null=True, blank=True)  # Campo per la posizione, può essere opzionale
     value = models.PositiveIntegerField(null=True, blank=True, default=1)
+    value_type = models.CharField(max_length=10,choices=CHOICHES)
 
     def __str__(self):
         return f"{self.habit.name} il {self.date}"

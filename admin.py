@@ -12,4 +12,9 @@ class HabitAdmin(admin.ModelAdmin):
 
 @admin.register(HabitEvent)
 class HabitEventAdmin(admin.ModelAdmin):
-    list_display = ('habit', 'date', 'time', 'location')
+    list_display = ('habit', 'date', 'time', 'location', 'value', 'value_type')
+    list_filter = (
+        'location',
+        'date',
+        'habit'
+    )

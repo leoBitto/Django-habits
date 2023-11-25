@@ -3,27 +3,108 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Category, Habit, HabitEvent
 from .forms import *
-
+from django.http import HttpResponse
+import pandas as pd
 from plotly.offline import plot
 import plotly.graph_objs as go
-
+import plotly.io as pio
 
 def overview(request):
-    # Calcola le statistiche
+    # query per le categorie
     categories = Category.objects.all()
-    total_events = HabitEvent.objects.all()
+    # crea dict per collegare categorie e abitudini
+    categories_and_habits = {}
+    for category in categories:
+        categories_and_habits[category] = Habit.objects.filter(category=category)   
+    #prendi le abitudini della prima categoria
+    habits_of_first_category = categories_and_habits[categories[0]]
+    #prendi la prima abitudine della prima categoria
+    habit = habits_of_first_category[0]
+
+    # prendi tutti valori relativi agli eventi dell'abitudine
+    habit_events = HabitEvent.objects.filter(habit=habit).values()
+    # crea il dataframe
+    df = pd.DataFrame().from_records(
+        habit_events, 
+        columns=[
+            'habit',
+            'date',
+            'time',
+            'location',
+            'value',
+            'value_type' ])
+    df['habit'] = habit
+    value_type = df['value_type'][0]
+    # raggruppa per la data
+    df = df.groupby(by=["date"], as_index=False)["value"].sum()
     
+    # crea la figura di plotly, aggiungi i dati e modifica layout
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=df["date"], y=df['value'],
+                        mode='lines',
+                        name=habit.name))
+    fig.update_layout(
+        margin=dict(
+            l=25,
+            r=25,
+            b=25,
+            t=25,
+            pad=4
+        ),
+        yaxis_title=dict(text=value_type, font=dict(size=16, color='#000000')),
+        paper_bgcolor="AliceBlue",
+    )
 
     # Creazione del contesto per il template
     context = {
         'habit_event_form':HabitEventForm(),
-        'categories':categories,
-
+        'categories_and_habits':categories_and_habits,
+        'habits_of_category':habits_of_first_category,
+        'graph' : pio.to_html(fig),
     }
 
     # Renderizza il template 'habits/overview.html' con il contesto creato
     return render(request, 'habits/overview.html', context)
 
+def show_graph(request, habit_id):
+    # prendi i valori dal db dell'evento richiesto
+    habit = Habit.objects.get(pk=habit_id)
+    habit_events = habit.habitevent_set.all().values()
+    
+    # crea il dataframe
+    df = pd.DataFrame().from_records(
+        habit_events, 
+        columns=[
+            'habit',
+            'date',
+            'time',
+            'location',
+            'value',
+            'value_type' ])
+    
+    df['habit'] = habit.name
+    
+    value_type = df['value_type'][0]
+    
+    df = df.groupby(by=["date"], as_index=False)["value"].sum()
+
+    #crea il grafico
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=df["date"], y=df['value'],
+                        mode='lines',
+                        name=habit.name))
+    fig.update_layout(
+        margin=dict(
+            l=25,
+            r=25,
+            b=25,
+            t=25,
+            pad=4
+        ),
+        yaxis_title=dict(text=value_type, font=dict(size=16, color='#000000')),
+        paper_bgcolor="AliceBlue",
+    )
+    return HttpResponse(pio.to_html(fig, full_html=False))
 
 # category views
 
@@ -45,7 +126,6 @@ def category(request):
 
     return render(request, 'habits/category.html', context)
 
- 
 def create_category(request):
     if request.method == 'POST':
         form = CategoryForm(request.POST)
