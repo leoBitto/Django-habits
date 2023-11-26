@@ -42,7 +42,8 @@ def overview(request):
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=df["date"], y=df['value'],
                         mode='lines',
-                        name=habit.name))
+                        name=habit.name,
+                        line=dict(color='black'),))
     fig.update_layout(
         margin=dict(
             l=25,
@@ -52,7 +53,8 @@ def overview(request):
             pad=4
         ),
         yaxis_title=dict(text=value_type, font=dict(size=16, color='#000000')),
-        paper_bgcolor="AliceBlue",
+        paper_bgcolor="#FFD180",
+        plot_bgcolor="#FFD180",
     )
 
     # Creazione del contesto per il template
@@ -92,7 +94,8 @@ def show_graph(request, habit_id):
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=df["date"], y=df['value'],
                         mode='lines',
-                        name=habit.name))
+                        name=habit.name,
+                        line=dict(color='black'),))
     fig.update_layout(
         margin=dict(
             l=25,
@@ -102,7 +105,8 @@ def show_graph(request, habit_id):
             pad=4
         ),
         yaxis_title=dict(text=value_type, font=dict(size=16, color='#000000')),
-        paper_bgcolor="AliceBlue",
+        paper_bgcolor="#FFD180",
+        plot_bgcolor="#FFD180",
     )
     return HttpResponse(pio.to_html(fig, full_html=False))
 

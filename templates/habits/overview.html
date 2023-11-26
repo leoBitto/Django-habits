@@ -5,10 +5,31 @@
 {% block title %}Overview{% endblock title %}
 
 {% block content %}
+<style>
+
+    /* Stile personalizzato per il colore arancione del bottone */
+    .btn-custom {
+        color: #000; /* Testo nero */
+        background-color: #FFD180; /* Colore arancione personalizzato */
+        border-color: #000; /* Colore del bordo */
+    }
+    .bg-custom{
+        background-color: #fcdba2;
+    }
+
+    .accordion{
+        --bs-accordion-btn-bg: #eb8634;
+        --bs-accordion-active-bg: #FFD180;
+        --bs-accordion-active-color: #000;
+        --bs-accordion-color: #000;
+        --bs-accordion-btn-focus-box-shadow: none;
+    }
+    
+</style>
     <div class="container">
         <h1>Overview</h1>
 
-        <nav class="navbar bg-light mt-3">
+        <nav class="navbar bg-custom mt-3">
             <div class="container-fluid d-flex justify-content-around">
                 <ul class="navbar-nav flex-row d-flex justify-content-around">
                     <li class="nav-item">
@@ -44,7 +65,7 @@
                             <div class="accordion-body d-flex justify-content-around">
                                 <span class="col fs-5">{{ habit.name }}</span>
                                 <button 
-                                class="btn btn-primary" 
+                                class="btn btn-custom" 
                                 hx-target="#graphContainer" 
                                 hx-swap="innerHTML" 
                                 hx-trigger="click"

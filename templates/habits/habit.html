@@ -4,10 +4,23 @@
 {% block title %}Habits{% endblock title %}
 
 {% block content %}
+<style>
+
+    /* Stile personalizzato per il colore arancione del bottone */
+    .btn-custom {
+        color: #000; /* Testo nero */
+        background-color: #FFD180; /* Colore arancione personalizzato */
+        border-color: #000; /* Colore del bordo */
+    }
+    .bg-custom{
+        background-color: #fcdba2;
+    }
+    
+</style>
 <div class="container p-4">
     <div class="d-flex flex-row justify-content-around py-3">
         <h1 class="fs-4">Habits</h1>
-        <a href="{% url 'habits:overview' %}" class="btn btn-outline-primary btn-sm mt-1">< Overview</a>
+        <a href="{% url 'habits:overview' %}" class="btn btn-custom btn-sm mt-1">< Overview</a>
     </div>
     <!-- Visualizzazione delle abitudini -->
 
@@ -21,19 +34,19 @@
                         <i class="mx-3 mt-1 {{ habit_form_dict.habit.category.icon }}"></i>
                     </div>
                     <div class="d-flex">
-                        <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="collapse" data-bs-target="#editForm-{{ habit_form_dict.habit.id }}">Modify</button>
+                        <button type="button" class="btn btn-custom btn-sm" data-bs-toggle="collapse" data-bs-target="#editForm-{{ habit_form_dict.habit.id }}">Modify</button>
                         <form action="{% url 'habits:delete_habit' habit_form_dict.habit.id %}" method="post" class="ms-2">
                             {% csrf_token %}
                             <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                         </form>
                     </div>
                 </li>
-                <div id="editForm-{{ habit_form_dict.habit.id }}" class="collapse mt-2">
+                <div id="editForm-{{ habit_form_dict.habit.id }}" class="collapse p-2 mt-2 bg-custom">
                     <h6>Modify Habit</h6>
                     <form action="{% url 'habits:edit_habit' habit_form_dict.habit.id %}" method="post">
                         {% csrf_token %}
                         {{ habit_form_dict.form.as_p }} {# Utilizzo il form di modifica corrispondente all'abitudine #}
-                        <button type="submit" class="btn btn-outline-primary btn-sm mx-auto d-block">Save</button>
+                        <button type="submit" class="btn btn-custom btn-sm mx-auto d-block">Save</button>
                     </form>
                 </div>
             {% endfor %}
@@ -41,12 +54,12 @@
     </ul>
     
     <!-- Form per la creazione di una nuova abitudine -->
-    <div class="d-flex justify-content-center flex-column m-3 mt-5 p-3 bg-light rounded">
+    <div class="d-flex justify-content-center flex-column m-3 mt-5 p-3 bg-custom rounded">
         <h4 class="fs-5">Create new habit</h4>
         <form action="{% url 'habits:create_habit' %}" method="post">
             {% csrf_token %}
             {{ habit_form.as_p }}
-            <button type="submit" class="btn btn-outline-success btn-sm mx-auto d-block">Create</button>
+            <button type="submit" class="btn btn-custom btn-sm mx-auto d-block">Create</button>
         </form>
     </div>
 </div>

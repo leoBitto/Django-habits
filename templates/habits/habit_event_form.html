@@ -1,11 +1,11 @@
 {% block event_block %}
 <!-- Form per la creazione di un nuovo evento abituale -->
-<div class="d-flex justify-content-center flex-column m-3 mt-3 p-3 bg-light rounded">
+<div class="d-flex justify-content-center flex-column m-3 mt-3 p-3 bg-custom rounded">
 <h4 class="fs-5">Create new habit event</h4>
 <form action="{% url 'habits:create_habit_event' %}" method="post">
     {% csrf_token %}
     {{ habit_event_form.as_p }}
-    <button type="submit" class="btn btn-outline-success btn-sm mx-auto d-block">Create</button>
+    <button type="submit" class="btn btn-custom btn-sm mx-auto d-block">Create</button>
 </form>
 </div>
 {% endblock event_block %}
