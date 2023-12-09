@@ -5,9 +5,11 @@ from .models import Category, Habit, HabitEvent
 from .forms import *
 from django.http import HttpResponse
 import pandas as pd
-from plotly.offline import plot
 import plotly.graph_objs as go
 import plotly.io as pio
+from django.urls import reverse
+from .utils import Calendar
+from datetime import datetime
 
 def overview(request):
     # query per le categorie
@@ -16,53 +18,57 @@ def overview(request):
     categories_and_habits = {}
     for category in categories:
         categories_and_habits[category] = Habit.objects.filter(category=category)   
-    #prendi le abitudini della prima categoria
-    habits_of_first_category = categories_and_habits[categories[0]]
-    #prendi la prima abitudine della prima categoria
-    habit = habits_of_first_category[0]
 
-    # prendi tutti valori relativi agli eventi dell'abitudine
-    habit_events = HabitEvent.objects.filter(habit=habit).values()
-    # crea il dataframe
-    df = pd.DataFrame().from_records(
-        habit_events, 
-        columns=[
-            'habit',
-            'date',
-            'time',
-            'location',
-            'value',
-            'value_type' ])
-    df['habit'] = habit
-    value_type = df['value_type'][0]
-    # raggruppa per la data
-    df = df.groupby(by=["date"], as_index=False)["value"].sum()
+    try:
+        #prendi le abitudini della prima categoria
+        habits_of_first_category = categories_and_habits[categories[0]]
+        #prendi la prima abitudine della prima categoria
+        habit = habits_of_first_category[0]
+        # prendi tutti valori relativi agli eventi dell'abitudine
+        habit_events = HabitEvent.objects.filter(habit=habit).values()
+        # crea il dataframe
+        df = pd.DataFrame().from_records(
+            habit_events, 
+            columns=[
+                'habit',
+                'date',
+                'time',
+                'location',
+                'value',
+                'value_type' ])
+        df['habit'] = habit
+        value_type = df['value_type'][0]
+        # raggruppa per la data
+        df = df.groupby(by=["date"], as_index=False)["value"].sum()
+        # crea la figura di plotly, aggiungi i dati e modifica layout
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x=df["date"], y=df['value'],
+                            mode='lines',
+                            name=habit.name,
+                            line=dict(color='black'),))
+        fig.update_layout(
+            margin=dict(
+                l=25,
+                r=25,
+                b=25,
+                t=25,
+                pad=4
+            ),
+            yaxis_title=dict(text=value_type, font=dict(size=16, color='#000000')),
+            paper_bgcolor="#FFD180",
+            plot_bgcolor="#FFD180",
+        )
+        graph = pio.to_html(fig)
+    except:
+        habits_of_first_category = []
+        graph = "<p>No graph to show</p>"
     
-    # crea la figura di plotly, aggiungi i dati e modifica layout
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(x=df["date"], y=df['value'],
-                        mode='lines',
-                        name=habit.name,
-                        line=dict(color='black'),))
-    fig.update_layout(
-        margin=dict(
-            l=25,
-            r=25,
-            b=25,
-            t=25,
-            pad=4
-        ),
-        yaxis_title=dict(text=value_type, font=dict(size=16, color='#000000')),
-        paper_bgcolor="#FFD180",
-        plot_bgcolor="#FFD180",
-    )
-
     # Creazione del contesto per il template
     context = {
         'habit_event_form':HabitEventForm(),
         'categories_and_habits':categories_and_habits,
         'habits_of_category':habits_of_first_category,
-        'graph' : pio.to_html(fig),
+        'graph' : graph,  
     }
 
     # Renderizza il template 'habits/overview.html' con il contesto creato
@@ -308,3 +314,24 @@ def delete_habit_event(request, habit_event_id):
         habit_event.delete()
 
     return redirect('habits:habit_event')
+
+
+def calendar(request):
+
+    # Ottenere la data e l'ora correnti
+    current_date_time = datetime.now()
+
+    # Ottenere l'anno e il mese dalla data corrente
+    year = current_date_time.year
+    month = current_date_time.month
+
+    events = HabitEvent.objects.filter(start_time__year=year, start_time__month=month)
+
+    calendar = Calendar(items=events, year=year, month=month)
+    html_cal = calendar.formatmonth(withyear=True)
+
+    return render(request, 'habits/calendar.html', {'calendar': html_cal})
+
+
+def day(request, year, month, day):
+    pass
