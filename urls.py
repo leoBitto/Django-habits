@@ -6,7 +6,7 @@ from . import views
 app_name = 'habits'
 urlpatterns = [
     # Visualizzazione del overviews
-    path('overview/', views.overview, name='overview'),
+    path('overview/', views.index, name='index'),
     path('show_graph/<int:habit_id>', views.show_graph, name="show_graph"),
 
     #visualizzazione calendario

@@ -11,7 +11,7 @@ from django.urls import reverse
 from .utils import Calendar
 from datetime import datetime
 
-def overview(request):
+def index(request):
     # query per le categorie
     categories = Category.objects.all()
     # crea dict per collegare categorie e abitudini
