@@ -16,16 +16,13 @@ class CategoryForm(forms.ModelForm):
 class HabitForm(forms.ModelForm):
     class Meta:
         model = Habit
-        fields = ['name', 'category', 'is_positive']
-        widgets = {
-            'is_positive': forms.CheckboxInput(),
-        }
-
+        fields = ['name', 'category', ]
+    
 
 class HabitEventForm(forms.ModelForm):
     class Meta:
         model = HabitEvent
-        fields = ['habit', 'date', 'time', 'location', 'value', 'value_type']
+        fields = ['habit', 'date', 'time', ]
 
         widgets = {
             'date': forms.DateInput(attrs={'type': 'date'}),

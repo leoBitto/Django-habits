@@ -1,0 +1,31 @@
+{% block nav %}
+<style>
+
+    /* Stile personalizzato per il colore arancione del bottone */
+    .btn-custom {
+        color: #000; /* Testo nero */
+        background-color: #FFD180; /* Colore arancione personalizzato */
+        border-color: #000; /* Colore del bordo */
+    }
+    .bg-custom{
+        background-color: #fcdba2;
+    }
+
+    .accordion{
+        --bs-accordion-btn-bg: #eb8634;
+        --bs-accordion-active-bg: #FFD180;
+        --bs-accordion-active-color: #000;
+        --bs-accordion-color: #000;
+        --bs-accordion-btn-focus-box-shadow: none;
+    }
+    
+</style>
+
+<nav class="d-flex justify-content-between pt-2">
+    <a href="{% url 'habits:category' %}" class="btn btn-custom btn-sm flex-fill">Category</a>
+    <a href="{% url 'habits:habit' %}" class="btn btn-custom btn-sm flex-fill">Habit</a>
+    <a href="{% url 'habits:index' %}" class="btn btn-custom btn-sm flex-fill">< Overview</a>
+</nav>
+
+
+{% endblock nav %}

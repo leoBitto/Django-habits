@@ -7,9 +7,9 @@ from django.http import HttpResponse
 import pandas as pd
 import plotly.graph_objs as go
 import plotly.io as pio
-from django.urls import reverse
-from .utils import Calendar
 from datetime import datetime
+from django.contrib import messages
+from django.http import JsonResponse
 
 def index(request):
     # query per le categorie
@@ -19,98 +19,77 @@ def index(request):
     for category in categories:
         categories_and_habits[category] = Habit.objects.filter(category=category)   
 
-    try:
-        #prendi le abitudini della prima categoria
-        habits_of_first_category = categories_and_habits[categories[0]]
-        #prendi la prima abitudine della prima categoria
-        habit = habits_of_first_category[0]
-        # prendi tutti valori relativi agli eventi dell'abitudine
-        habit_events = HabitEvent.objects.filter(habit=habit).values()
-        # crea il dataframe
-        df = pd.DataFrame().from_records(
-            habit_events, 
-            columns=[
-                'habit',
-                'date',
-                'time',
-                'location',
-                'value',
-                'value_type' ])
-        df['habit'] = habit
-        value_type = df['value_type'][0]
-        # raggruppa per la data
-        df = df.groupby(by=["date"], as_index=False)["value"].sum()
-        # crea la figura di plotly, aggiungi i dati e modifica layout
-        fig = go.Figure()
-        fig.add_trace(go.Scatter(x=df["date"], y=df['value'],
-                            mode='lines',
-                            name=habit.name,
-                            line=dict(color='black'),))
-        fig.update_layout(
-            margin=dict(
-                l=25,
-                r=25,
-                b=25,
-                t=25,
-                pad=4
-            ),
-            yaxis_title=dict(text=value_type, font=dict(size=16, color='#000000')),
-            paper_bgcolor="#FFD180",
-            plot_bgcolor="#FFD180",
-        )
-        graph = pio.to_html(fig)
-    except:
-        habits_of_first_category = []
-        graph = "<p>No graph to show</p>"
-    
     # Creazione del contesto per il template
     context = {
         'habit_event_form':HabitEventForm(),
-        'categories_and_habits':categories_and_habits,
-        'habits_of_category':habits_of_first_category,
-        'graph' : graph,  
+        'categories_and_habits':categories_and_habits,  
     }
 
     # Renderizza il template 'habits/overview.html' con il contesto creato
     return render(request, 'habits/overview.html', context)
 
+
 def show_graph(request, habit_id):
-    # prendi i valori dal db dell'evento richiesto
+    # ottieni le date dal request
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+
+    # verifica se le date sono state fornite
+    if not start_date or not end_date:
+        return JsonResponse({'error': 'Please insert both dates.'})
+    elif start_date > end_date:
+        return JsonResponse({'error': 'the start date must be before the end date.'})
+
+    # converti le date in oggetti datetime
+    start_date = datetime.strptime(start_date, "%Y-%m-%d")
+    end_date = datetime.strptime(end_date, "%Y-%m-%d")
+
+    # filtra gli eventi dell'abitudine per le date
     habit = Habit.objects.get(pk=habit_id)
-    habit_events = habit.habitevent_set.all().values()
+    habit_events = habit.habitevent_set.filter(date__range=(start_date, end_date)).values()
     
+
     # crea il dataframe
     df = pd.DataFrame().from_records(
         habit_events, 
         columns=[
-            'habit',
             'date',
             'time',
-            'location',
-            'value',
-            'value_type' ])
+         ])
     
-    df['habit'] = habit.name
     
-    value_type = df['value_type'][0]
-    
-    df = df.groupby(by=["date"], as_index=False)["value"].sum()
+    df = df.groupby(by=["date"], as_index=False).count()
 
+    # crea un DataFrame con tutte le date da start_date a end_date
+    date_range = pd.date_range(start=start_date, end=end_date)
+    df_dates = pd.DataFrame(date_range, columns=['date'])
+    # converti la colonna 'date' in df in datetime
+    df['date'] = pd.to_datetime(df['date'])
+    # unisci df_dates con il tuo DataFrame originale
+    df = pd.merge(df_dates, df, how='left', on='date')
+
+    # riempi i valori mancanti
+    df = df.fillna(0)
+    
+    
     #crea il grafico
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x=df["date"], y=df['value'],
+    fig.add_trace(go.Scatter(x=df["date"], y=df['time'],
                         mode='lines',
                         name=habit.name,
                         line=dict(color='black'),))
     fig.update_layout(
         margin=dict(
-            l=25,
-            r=25,
-            b=25,
-            t=25,
-            pad=4
+            l=5,
+            r=5,
+            b=5,
+            t=10,
+            pad=2
         ),
-        yaxis_title=dict(text=value_type, font=dict(size=16, color='#000000')),
+        yaxis=dict(
+            title=dict(text="", font=dict(size=16, color='#000000')),
+            range=[0, max(df['time'])]  # Imposta l'intervallo dell'asse y per iniziare da 0
+        ),
         paper_bgcolor="#FFD180",
         plot_bgcolor="#FFD180",
     )
@@ -145,11 +124,14 @@ def create_category(request):
             color = form.cleaned_data['color']
             icon = form.cleaned_data['icon']
 
-        Category.objects.create(
-            name=name,
-            color=color,
-            icon=icon
-        )
+            Category.objects.create(
+                name=name,
+                color=color,
+                icon=icon
+            )
+            messages.success(request, 'Category successfully created')
+        else:
+            messages.info(request, "Couldn't create Category")
     return redirect('habits:category')
 
 def edit_category(request, category_id):
@@ -158,7 +140,10 @@ def edit_category(request, category_id):
         form = CategoryForm(request.POST, instance=category)  # Passa l'istanza della categoria al form
         if form.is_valid():
             form.save()  # Salva le modifiche
+            messages.success(request, 'Category successfully edited')
             return redirect('habits:category')
+        else:
+            messages.error(request, "Couldn't edit Category")
     else:
         form = CategoryForm(instance=category)
     return redirect('habits:category')
@@ -167,7 +152,9 @@ def delete_category(request, category_id):
     if request.method == 'POST':
         category = get_object_or_404(Category, id=category_id)
         category.delete()
-
+        messages.success(request, 'Category successfully eliminated')
+    else:
+        messages.error(request, "Couldn't eliminate Category")
     return redirect('habits:category')
 
 # habit views
@@ -219,7 +206,7 @@ def create_habit(request):
 
         if habit_form.is_valid():
             habit = habit_form.save()  # Salva l'abitudine
-
+            messages.success(request, "Habit created")
 
             return redirect('habits:habit')  # Redirect alla lista delle abitudini o ad altra pagina desiderata
     
@@ -233,6 +220,7 @@ def edit_habit(request, habit_id):
         form = HabitForm(request.POST, instance=habit)  
         if form.is_valid():
             form.save()  
+            messages.success(request, "Habit modified")
             return redirect('habits:habit')
     else:
         form = HabitForm(instance=habit)
@@ -243,6 +231,7 @@ def delete_habit(request, habit_id):
     if request.method == 'POST':
         habit = get_object_or_404(Habit, id=habit_id)
         habit.delete()
+        messages.success(request, "habit eliminated")
 
     return redirect('habits:habit')
 
@@ -284,16 +273,17 @@ def create_habit_event(request):
             habit = form.cleaned_data['habit']
             date = form.cleaned_data['date']
             time = form.cleaned_data['time']
-            location = form.cleaned_data['location']
+
 
             HabitEvent.objects.create(
                 habit=habit,
                 date=date,
                 time=time,
-                location=location,
+
             )
+            messages.success(request, "Event Created.")
             
-    return redirect('habits:habit_event')
+    return redirect('habits:index')
 
 
 def edit_habit_event(request, habit_event_id):
@@ -301,37 +291,20 @@ def edit_habit_event(request, habit_event_id):
     if request.method == 'POST':
         form = HabitEventForm(request.POST, instance=habit_event)  
         if form.is_valid():
-            form.save()  
-            return redirect('habits:habit_event')
+            form.save() 
+            messages.success(request, "Event Modified.") 
+            return redirect('habits:index')
     else:
         form = HabitEventForm(instance=habit_event)
-    return redirect('habits:habit_event')
+    return redirect('habits:index')
 
 
 def delete_habit_event(request, habit_event_id):
     if request.method == 'POST':
         habit_event = get_object_or_404(HabitEvent, id=habit_event_id)
         habit_event.delete()
+        messages.success(request, "Event Eliminated")
 
-    return redirect('habits:habit_event')
-
-
-def calendar(request):
-
-    # Ottenere la data e l'ora correnti
-    current_date_time = datetime.now()
-
-    # Ottenere l'anno e il mese dalla data corrente
-    year = current_date_time.year
-    month = current_date_time.month
-
-    events = HabitEvent.objects.filter(start_time__year=year, start_time__month=month)
-
-    calendar = Calendar(items=events, year=year, month=month)
-    html_cal = calendar.formatmonth(withyear=True)
-
-    return render(request, 'habits/calendar.html', {'calendar': html_cal})
+    return redirect('habits:index')
 
 
-def day(request, year, month, day):
-    pass

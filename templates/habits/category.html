@@ -5,24 +5,40 @@
 {% block title %}Categories{% endblock title %}
 
 {% block content %}
-<style>
 
-    /* Stile personalizzato per il colore arancione del bottone */
-    .btn-custom {
-        color: #000; /* Testo nero */
-        background-color: #FFD180; /* Colore arancione personalizzato */
-        border-color: #000; /* Colore del bordo */
-    }
-    .bg-custom{
-        background-color: #fcdba2;
-    }
-    
-</style>
-<div class="container p-4">
-    <div class="d-flex flex-row justify-content-between align-items-center p-3">
-        <h1 class="fs-4">Categories</h1>
-        <a href="{% url 'habits:index' %}" class="btn btn-custom btn-sm">< Overview</a>
+<div class="container p-2">
+
+    {% include "habits/navbar.html" %}
+
+    <div class="d-flex flex-row p-2 justify-content-between">
+        <h1>Categories</h1>
+        <button type="button" class="btn btn-custom btn-sm m-1" data-bs-toggle="modal" data-bs-target="#CategoryModal">
+            <i class="fa-solid fa-plus"></i> Category
+        </button>
     </div>
+
+    <!-- Modal Category-->
+    <div class="modal fade" id="CategoryModal" tabindex="-1" aria-labelledby="CategoryModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="CategoryModalLabel">Create new category</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Form per la creazione di una nuova categoria -->
+                <div class="d-flex justify-content-center flex-column m-3 mt-5 p-3 bg-custom rounded">
+                    <form action="{% url 'habits:create_category' %}" method="post">
+                        {% csrf_token %}
+                        {{ category_form.as_p }}
+                        <button type="submit" class="btn btn-custom btn-sm mx-auto d-block">Create</button>
+                    </form>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Visualizzazione delle categorie -->
     <ul class="list-group p-2">
         {% for category, edit_category_form in category_form_dict.items %}
@@ -50,16 +66,7 @@
             </div>
         {% endfor %}
     </ul>
-    <!-- Form per la creazione di una nuova categoria -->
 
-    <div class="d-flex justify-content-center flex-column m-3 mt-5 p-3 bg-custom rounded">
-        <h4 class="fs-5 mb-3">Create new category</h4>
-        <form action="{% url 'habits:create_category' %}" method="post">
-            {% csrf_token %}
-            {{ category_form.as_p }}
-            <button type="submit" class="btn btn-custom btn-sm mx-auto d-block">Create</button>
-        </form>
-    </div>
 
 </div>
 {% endblock %}

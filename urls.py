@@ -9,9 +9,6 @@ urlpatterns = [
     path('overview/', views.index, name='index'),
     path('show_graph/<int:habit_id>', views.show_graph, name="show_graph"),
 
-    #visualizzazione calendario
-    path('calendar/<int:year>/<int:month>/', views.calendar, name='calendar'),
-    path('day/<int:year>/<int:month>/<int:day>/', views.day, name='day'),
 
     # Gestione delle categorie
     path('categories/', views.category, name='category'),

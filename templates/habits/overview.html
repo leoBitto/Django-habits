@@ -5,48 +5,41 @@
 {% block title %}Overview{% endblock title %}
 
 {% block content %}
-<style>
 
-    /* Stile personalizzato per il colore arancione del bottone */
-    .btn-custom {
-        color: #000; /* Testo nero */
-        background-color: #FFD180; /* Colore arancione personalizzato */
-        border-color: #000; /* Colore del bordo */
-    }
-    .bg-custom{
-        background-color: #fcdba2;
-    }
+    <div class="container p-2">
+        {% include "habits/navbar.html" %}
 
-    .accordion{
-        --bs-accordion-btn-bg: #eb8634;
-        --bs-accordion-active-bg: #FFD180;
-        --bs-accordion-active-color: #000;
-        --bs-accordion-color: #000;
-        --bs-accordion-btn-focus-box-shadow: none;
-    }
-    
-</style>
-    <div class="container">
-        <h1>Overview</h1>
+       
+        <div class="d-flex flex-row p-2 justify-content-between" >
+            <h1>Overview</h1>
+            <button type="button" class="btn btn-custom btn-sm m-1" data-bs-toggle="modal" data-bs-target="#EventModal">
+                <i class="fa-solid fa-plus"></i> Event
+            </button>
+        </div>
 
-        <nav class="navbar bg-custom mt-3">
-            <div class="container-fluid d-flex justify-content-around">
-                <ul class="navbar-nav flex-row d-flex justify-content-around">
-                    <li class="nav-item">
-                        <a class="navbar-brand" href="{% url 'habits:category' %}">Category | </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="navbar-brand" href="{% url 'habits:habit' %}">Habit | </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="navbar-brand" href="{% url 'habits:habit_event' %}">Habit Event</a>
-                    </li>
-                </ul>
+
+        <!-- Modal Event-->
+        <div class="modal fade" id="EventModal" tabindex="-1" aria-labelledby="EventModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="EventModalLabel">Create new event</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Il tuo form va qui -->
+                    <div class="d-flex justify-content-center flex-column m-3 mt-3 p-3 bg-custom rounded">
+                    <form action="{% url 'habits:create_habit_event' %}" method="post">
+                        {% csrf_token %}
+                        {{ habit_event_form.as_p }}
+                        <button type="submit" class="btn btn-custom btn-sm mx-auto d-block">Create</button>
+                    </form>
+                    </div>
+                </div>
+                </div>
             </div>
-        </nav>
-
-        {% include "habits/habit_event_form.html" %}
-
+        </div>
+                
         <div class="d-flex flex-column flex-md-row mt-3">
             <div class="col-md-6 col-12 m-2">
                 <h2 class="my-1">Categories</h2>
@@ -62,16 +55,13 @@
                         </h2>
                         {% for habit in habits%}
                         <div id="collapse{{category.id}}" class="accordion-collapse collapse " aria-labelledby="heading{{category.id}}" data-bs-parent="#accordionCategory">
-                            <div class="accordion-body d-flex justify-content-around">
-                                <span class="col fs-5">{{ habit.name }}</span>
-                                <button 
-                                class="btn btn-custom" 
-                                hx-target="#graphContainer" 
-                                hx-swap="innerHTML" 
-                                hx-trigger="click"
-                                data-hx-get="{% url 'habits:show_graph' habit.id %}">
-                                Show Graph
-                                </button>
+                            <div class="accordion-body d-flex flex-column justify-content-around">
+                                <h5 class="col fs-5 text-center">{{ habit.name }}</h5>
+                                <form class="d-flex flex-column" hx-get="{% url 'habits:show_graph' habit.id %}" hx-target="#graphContainer" hx-swap="innerHTML">
+                                    <input type="date" id="start_date" name="start_date">
+                                    <input type="date" id="end_date" name="end_date">
+                                    <button type="submit" class="btn btn-custom">Show Graph</button>
+                                </form>
                             </div>
                         </div>
                         {% endfor %}
@@ -80,15 +70,15 @@
                 </div>
             </div>
 
-            <div class="col-md-6 col-12 m-2">
-                <h2 class="my-1">Line Chart</h2>
+            <div class="col-md-6 col-12 m-2 p-2">
                 <div id="graphContainer" class="" >
-                    {{ graph | safe }}
+                    
                 </div>                
             </div>
         </div>
     </div>
-    {% include 'habits/calendar.html' %}
+    
+    
 {% endblock %}
 
 
