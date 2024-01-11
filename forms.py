@@ -3,6 +3,8 @@
 from django import forms
 from .models import *
 from django.core.exceptions import ValidationError
+from datetime import datetime
+
 
 class CategoryForm(forms.ModelForm):
     class Meta:
@@ -25,7 +27,15 @@ class HabitEventForm(forms.ModelForm):
         fields = ['habit', 'date', 'time', ]
 
         widgets = {
-            'date': forms.DateInput(attrs={'type': 'date'}),
-            'time': forms.TimeInput(attrs={'type': 'time'}),
+            'date': forms.DateInput(attrs={'type': 'date'}, format='%Y-%m-%d'),
+            'time': forms.TimeInput(attrs={'type': 'time'}, format='%H:%M'),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        # Imposta i valori di default per 'date' e 'time' come il momento attuale
+        self.fields['date'].initial = datetime.now().strftime('%Y-%m-%d')
+        self.fields['time'].initial = datetime.now().strftime('%H:%M')
+
   
