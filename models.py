@@ -29,5 +29,8 @@ class HabitEvent(models.Model):
 
     def __str__(self):
         return f"{self.habit.name} il {self.date}"
+    
+    class Meta:
+        ordering = ['date', 'time']
 
 

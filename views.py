@@ -18,11 +18,14 @@ def index(request):
     categories_and_habits = {}
     for category in categories:
         categories_and_habits[category] = Habit.objects.filter(category=category)   
+    
+    events_of_today = HabitEvent.objects.filter(date = datetime.today())
 
     # Creazione del contesto per il template
     context = {
         'habit_event_form':HabitEventForm(),
         'categories_and_habits':categories_and_habits,  
+        'events_of_today': events_of_today,
     }
 
     # Renderizza il template 'habits/overview.html' con il contesto creato
