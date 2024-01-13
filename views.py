@@ -7,7 +7,7 @@ from django.http import HttpResponse
 import pandas as pd
 import plotly.graph_objs as go
 import plotly.io as pio
-from datetime import datetime
+from datetime import date, datetime, timedelta
 from django.contrib import messages
 from django.http import JsonResponse
 
@@ -19,13 +19,15 @@ def index(request):
     for category in categories:
         categories_and_habits[category] = Habit.objects.filter(category=category)   
     
-    events_of_today = HabitEvent.objects.filter(date = datetime.today())
+    events_of_today = HabitEvent.objects.filter(date = date.today())
+    events_of_yesterday = HabitEvent.objects.filter(date = date.today() + timedelta(days=-1))
 
     # Creazione del contesto per il template
     context = {
         'habit_event_form':HabitEventForm(),
         'categories_and_habits':categories_and_habits,  
         'events_of_today': events_of_today,
+        'events_of_yesterday':events_of_yesterday,
     }
 
     # Renderizza il template 'habits/overview.html' con il contesto creato

@@ -44,6 +44,14 @@
         <div class="container app-section">
             <div class="row">
                 <div class="col-md-6 mx-auto">
+                    <h5 class="mb-4">Yesterday events:</h5>
+                    {% for event in events_of_yesterday %}
+                        <div class="mb-0">
+                            <span class="fw-bold">{{ event.habit }}</span> - {{ event.time }}
+                        </div>
+                    {% endfor %}
+                </div>
+                <div class="col-md-6 mx-auto">
                     <h5 class="mb-4">Today events:</h5>
                     {% for event in events_of_today %}
                         <div class="mb-0">
