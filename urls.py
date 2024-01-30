@@ -6,8 +6,8 @@ from . import views
 app_name = 'habits'
 urlpatterns = [
     # Visualizzazione del overviews
-    path('overview/', views.index, name='index'),
-    path('show_graph/<int:habit_id>', views.show_graph, name="show_graph"),
+    path('index/', views.index, name='index'),
+    path('create_report/', views.create_report, name='create_report'),
 
 
     # Gestione delle categorie

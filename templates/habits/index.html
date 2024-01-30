@@ -11,8 +11,11 @@
         {% include "habits/navbar.html" %}
 
        
-        <div class="d-flex flex-row p-2 justify-content-between" >
-            <h1>Overview</h1>
+        <div class="d-flex flex-row p-2 justify-content-around" >
+            <h1 class="flex-grow-1">Overview</h1>
+            <button class="btn btn-custom btn-sm m-1" data-bs-toggle="collapse" href="#reportForm" role="button" aria-bs-expanded="false" aria-bs-controls="reportForm">
+                Create Report
+            </button>
             <button type="button" class="btn btn-custom btn-sm m-1" data-bs-toggle="modal" data-bs-target="#EventModal">
                 <i class="fa-solid fa-plus"></i> Event
             </button>
@@ -41,9 +44,30 @@
             </div>
         </div>
 
+        <div class="collapse text-center" id="reportForm">
+            <div class="card card-body">
+                <form method="post" action="{% url 'habits:create_report' %}" class="form">
+                {% csrf_token %}
+                <div class="form-group m-1">
+                    {{ report_form.habit.label_tag }}
+                    {{ report_form.habit }}
+                </div>
+                <div class="form-group m-1">
+                    {{ report_form.start_date.label_tag }}
+                    {{ report_form.start_date }}
+                </div>
+                <div class="form-group m-1">
+                    {{ report_form.end_date.label_tag }}
+                    {{ report_form.end_date }}
+                </div>
+                <button type="submit" class="btn btn-custom">Generate Report</button>
+                </form>
+            </div>
+        </div>
+
         <div class="container app-section">
             <div class="row">
-                <div class="col-md-6 mx-auto">
+                <div class="col-6 mx-auto text-start">
                     <h5 class="mb-4">Yesterday events:</h5>
                     {% for event in events_of_yesterday %}
                         <div class="mb-0">
@@ -51,7 +75,7 @@
                         </div>
                     {% endfor %}
                 </div>
-                <div class="col-md-6 mx-auto">
+                <div class="col-6 mx-auto text-start">
                     <h5 class="mb-4">Today events:</h5>
                     {% for event in events_of_today %}
                         <div class="mb-0">
@@ -61,44 +85,25 @@
                 </div>
             </div>
         </div>
-        
-                
-        <div class="d-flex flex-column flex-md-row mt-3">
-            <div class="col-md-6 col-12 m-2">
-                <h2 class="my-1">Categories</h2>
-                <div class="accordion mb-5 p-4" id="accordionCategory">
-                    {% for category, habits in categories_and_habits.items %}
-                    <div class="accordion-item">
-                        <h2 class="accordion-header" id="heading{{category.id}}">
-                            <button class="accordion-button d-flex justify-content-around" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{category.id}}" aria-expanded="true" aria-controls="collapse{{category.id}}">
-                                <i class="col mt-2 {{ category.icon }}"></i>
-                                <span class="col fs-5">{{ category.name }}</span>
-                                <span class="col ms-2" style="width:120px; height: 30px; background-color:{{category.color}}; display: inline-block;"></span>
-                            </button>
-                        </h2>
-                        {% for habit in habits%}
-                        <div id="collapse{{category.id}}" class="accordion-collapse collapse " aria-labelledby="heading{{category.id}}" data-bs-parent="#accordionCategory">
-                            <div class="accordion-body d-flex flex-column justify-content-around">
-                                <h5 class="col fs-5 text-center">{{ habit.name }}</h5>
-                                <form class="d-flex flex-column" hx-get="{% url 'habits:show_graph' habit.id %}" hx-target="#graphContainer" hx-swap="innerHTML">
-                                    <input type="date" id="start_date" name="start_date">
-                                    <input type="date" id="end_date" name="end_date">
-                                    <button type="submit" class="btn btn-custom">Show Graph</button>
-                                </form>
-                            </div>
-                        </div>
-                        {% endfor %}
+
+        <div class="container mt-4">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-4">
+                        <!-- Primo grafico (pie chart) -->
+                        {{ pie_chart_html|safe }}
                     </div>
-                    {% endfor %}
+                </div>
+        
+                <div class="col-md-6">
+                    <div class="mb-4">
+                        <!-- Secondo grafico (heatmap) -->
+                        {{ heatmap_html|safe }}
+                    </div>
                 </div>
             </div>
-
-            <div class="col-md-6 col-12 m-2 p-2">
-                <div id="graphContainer" class="" >
-                    
-                </div>                
-            </div>
         </div>
+        
     </div>
     
     

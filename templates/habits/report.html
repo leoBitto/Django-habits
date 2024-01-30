@@ -1,0 +1,38 @@
+{% extends 'website/base.html' %}
+
+{% block title %}Report{% endblock title %}
+
+{% block content %}
+
+<div class="container p-2">
+    {% include "habits/navbar.html" %}
+
+    <div class="row">
+        <div class="col-md-6">
+            <h4>Pie Chart</h4>
+            <p>proportion of positive habits in the period</p>
+            {{ pie_html | safe }}
+        </div>
+        <div class="col-md-6">
+            <h4>Heat Map</h4>
+            <p>correlation between habits in the period</p>
+            {{ heatmap_html | safe }}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <h4>Daily Chart</h4>
+            <p>frequency of the event in the period</p>
+            {{ daily_html | safe }}
+        </div>
+        <div class="col-md-6">
+            <h4>Hourly Chart</h4>
+            <p>frequency of the event in the hours</p>
+            {{ hourly_html | safe }}
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

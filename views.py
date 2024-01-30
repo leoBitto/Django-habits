@@ -5,100 +5,53 @@ from .models import Category, Habit, HabitEvent
 from .forms import *
 from django.http import HttpResponse
 import pandas as pd
-import plotly.graph_objs as go
-import plotly.io as pio
 from datetime import date, datetime, timedelta
 from django.contrib import messages
 from django.http import JsonResponse
+from .utils import *
 
 def index(request):
-    # query per le categorie
-    categories = Category.objects.all()
-    # crea dict per collegare categorie e abitudini
-    categories_and_habits = {}
-    for category in categories:
-        categories_and_habits[category] = Habit.objects.filter(category=category)   
-    
-    events_of_today = HabitEvent.objects.filter(date = date.today())
-    events_of_yesterday = HabitEvent.objects.filter(date = date.today() + timedelta(days=-1))
+    events_of_today = HabitEvent.objects.filter(date=date.today())
+    events_of_yesterday = HabitEvent.objects.filter(date=date.today() + timedelta(days=-1))
+
+    # Chiamata alla funzione ausiliaria per creare il grafico a torta
+    pie_chart_html = generate_pie_chart(date.today(), date.today())
+
+    # Calcola la heatmap delle correlazioni
+    heatmap_html = generate_heat_map(date(2024,1,1), date.today())
+
+    report_form = ReportForm()
 
     # Creazione del contesto per il template
     context = {
-        'habit_event_form':HabitEventForm(),
-        'categories_and_habits':categories_and_habits,  
+        'habit_event_form': HabitEventForm(),
         'events_of_today': events_of_today,
-        'events_of_yesterday':events_of_yesterday,
+        'events_of_yesterday': events_of_yesterday,
+        'pie_chart_html': pie_chart_html,
+        'heatmap_html': heatmap_html,
+        'report_form': report_form,
     }
 
-    # Renderizza il template 'habits/overview.html' con il contesto creato
-    return render(request, 'habits/overview.html', context)
+    # Renderizza il template 'habits/index.html' con il contesto creato
+    return render(request, 'habits/index.html', context)
 
+def create_report(request):
+    if request.method == 'POST':
+        report_form = ReportForm(request.POST)
+        if report_form.is_valid():
+            habit = report_form.cleaned_data['habit']
+            start_date = report_form.cleaned_data['start_date']
+            end_date = report_form.cleaned_data['end_date']
 
-def show_graph(request, habit_id):
-    # ottieni le date dal request
-    start_date = request.GET.get('start_date')
-    end_date = request.GET.get('end_date')
+    context = {
+        'hourly_html':generate_hourly_chart(start_date, end_date, habit.id),
+        'daily_html':generate_daily_chart(start_date, end_date, habit.id),
+        'heatmap_html': generate_heat_map(start_date, end_date),
+        'pie_html': generate_pie_chart(start_date, end_date),
+    }
 
-    # verifica se le date sono state fornite
-    if not start_date or not end_date:
-        return JsonResponse({'error': 'Please insert both dates.'})
-    elif start_date > end_date:
-        return JsonResponse({'error': 'the start date must be before the end date.'})
-
-    # converti le date in oggetti datetime
-    start_date = datetime.strptime(start_date, "%Y-%m-%d")
-    end_date = datetime.strptime(end_date, "%Y-%m-%d")
-
-    # filtra gli eventi dell'abitudine per le date
-    habit = Habit.objects.get(pk=habit_id)
-    habit_events = habit.habitevent_set.filter(date__range=(start_date, end_date)).values()
-    
-
-    # crea il dataframe
-    df = pd.DataFrame().from_records(
-        habit_events, 
-        columns=[
-            'date',
-            'time',
-         ])
-    
-    
-    df = df.groupby(by=["date"], as_index=False).count()
-
-    # crea un DataFrame con tutte le date da start_date a end_date
-    date_range = pd.date_range(start=start_date, end=end_date)
-    df_dates = pd.DataFrame(date_range, columns=['date'])
-    # converti la colonna 'date' in df in datetime
-    df['date'] = pd.to_datetime(df['date'])
-    # unisci df_dates con il tuo DataFrame originale
-    df = pd.merge(df_dates, df, how='left', on='date')
-
-    # riempi i valori mancanti
-    df = df.fillna(0)
-    
-    
-    #crea il grafico
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(x=df["date"], y=df['time'],
-                        mode='lines',
-                        name=habit.name,
-                        line=dict(color='black'),))
-    fig.update_layout(
-        margin=dict(
-            l=5,
-            r=5,
-            b=5,
-            t=10,
-            pad=2
-        ),
-        yaxis=dict(
-            title=dict(text="", font=dict(size=16, color='#000000')),
-            range=[0, max(df['time'])]  # Imposta l'intervallo dell'asse y per iniziare da 0
-        ),
-        paper_bgcolor="#FFD180",
-        plot_bgcolor="#FFD180",
-    )
-    return HttpResponse(pio.to_html(fig, full_html=False))
+    # Renderizza il template 'habits/index.html' con il contesto creato
+    return render(request, 'habits/report.html', context)
 
 # category views
 

@@ -15,6 +15,7 @@ class Habit(models.Model):
     name = models.CharField(max_length=100)
     description = models.CharField(max_length=255, blank=True, null=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    is_positive = models.BooleanField(default=True)
 
     def __str__(self):
         return self.name
