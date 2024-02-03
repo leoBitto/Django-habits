@@ -45,10 +45,11 @@ def test(request, start_date, end_date):
     # df = pd.DataFrame(correlation_values, index=habit_names, columns=habit_names)
 
     context={
-        'col1':type(df['habit__name'][1]),
-        'col2':type(df['date'][1]),
-        'col3':type(df['time'][1]),
-        
+        'col1':type(df['habit__name'][0]),
+        'col2':type(df['date'][0]),
+        'col3':type(df['time'][0]),
+        'hour':df['time'][0].hour,
+        'minute':df['time'][0].minute,
         'df': df.to_html(classes='table table-bordered', index=False),
         
     }
