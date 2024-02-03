@@ -22,9 +22,7 @@ def test(request, start_date, end_date):
 
     df = pd.DataFrame.from_records(events_data)
 
-    #df['time'] = df['time'].replace({'noon': '12:00 p.m.', 'midnight': '12:00 a.m.'})
-    #df = df[df['time'] != '-']
-    #df.dropna(inplace=True)
+    df.dropna(inplace=True)
 
 
     # Calcola i minuti da mezzanotte direttamente dalla colonna 'time'
