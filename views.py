@@ -22,9 +22,6 @@ def test(request, start_date, end_date):
 
     df = pd.DataFrame.from_records(events_data)
 
-    df1=df['date']
-    df2=df['time']
-    df3=df['date'] + ' ' + df['time']
     # Combina le colonne 'date' e 'time' in una colonna 'timestamp'
     #df['timestamp'] = pd.to_datetime(df['date'] + ' ' + df['time'])
 
@@ -56,9 +53,7 @@ def test(request, start_date, end_date):
         'type_o':df['time'][0],
         'from_mid':convert_time_to_minutes(df['time'][0]),
         'df': df.to_html(classes='table table-bordered', index=False),
-        'df1': df1.to_html(classes='table table-bordered', index=False),
-        'df2': df2.to_html(classes='table table-bordered', index=False),
-        'df3': df3.to_html(classes='table table-bordered', index=False),
+        'test': pd.to_datetime(df['date'][0] + ' ' + df['time'][0])
     }
 
     return render(request, 'habits/test.html', context)
