@@ -24,14 +24,6 @@ def test(request, start_date, end_date):
 
     # Calcola i minuti da mezzanotte direttamente dalla colonna 'time'
     #df['minutes_from_midnight'] = df['time'].apply(lambda x: x.hour * 60 + x.minute)
-    # Ottieni il tipo di ogni colonna come dizionario
-    # Crea un DataFrame per i tipi della prima riga
-    tipi_prima_riga_df = pd.DataFrame(columns=['Colonna', 'Tipo Prima Riga'])
-
-    # Aggiungi i tipi della prima riga al DataFrame
-    for colonna in df.columns:
-        tipo_prima_riga = str(type(df[colonna][0]))
-        tipi_prima_riga_df = tipi_prima_riga_df.append({'Colonna': colonna, 'Tipo Prima Riga': tipo_prima_riga}, ignore_index=True)
 
 
     # habit_names = df['habit__name'].unique()
@@ -53,12 +45,11 @@ def test(request, start_date, end_date):
     # df = pd.DataFrame(correlation_values, index=habit_names, columns=habit_names)
 
     context={
-        #'convert_test_hour':df['time'][0].hour,
-        #'convert_test_minute':df['time'][0].minute,
-        #'type':type(df['time']),
-        #'type_o':df['time'][0],
-        #'from_mid':convert_time_to_minutes(df['time'][0]),
-        'df': tipi_prima_riga_df.to_html(classes='table table-bordered', index=False),
+        'col1':type(df['habit__name'][0]),
+        'col2':type(df['date'][0]),
+        'col3':type(df['time'][0]),
+        
+        'df': df.to_html(classes='table table-bordered', index=False),
         
     }
 
