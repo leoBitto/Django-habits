@@ -51,7 +51,7 @@ def test(request, start_date, end_date):
 
     context={
         'col1':type(df['habit__name'][0]),
-        'col2':type(df['date'][0]),
+      
         'col3':type(df['time'][0]),
         #'hour':datetime.strptime(df['time'][0], '%H:%M:%S'),
         'df': df.to_html(classes='table table-bordered', index=False),
