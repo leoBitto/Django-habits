@@ -9,6 +9,7 @@ urlpatterns = [
     path('index/', views.index, name='index'),
     path('create_report/', views.create_report, name='create_report'),
 
+    path('test/<str:start_date>/<str:end_date>', views.test, name="test"),
 
     # Gestione delle categorie
     path('categories/', views.category, name='category'),

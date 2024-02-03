@@ -8,7 +8,7 @@ import pandas as pd
 from datetime import date, datetime, timedelta
 import plotly.graph_objs as go
 import plotly.io as pio
-from django.contrib import messages
+
 
 
 
@@ -17,6 +17,7 @@ def convert_time_to_minutes(time):
     Convert datetime.time object to minutes from midnight.
     """
     return time.hour * 60 + time.minute
+
 
 def generate_heat_map(start_date, end_date):
     """

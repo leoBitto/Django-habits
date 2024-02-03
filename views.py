@@ -10,6 +10,47 @@ from django.contrib import messages
 from django.http import JsonResponse
 from .utils import *
 
+def test(request, start_date, end_date):
+        
+    start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
+    end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
+
+    # Extract habit events and their times
+    events_data = HabitEvent.objects.filter(
+        Q(date__gte=start_date) & Q(date__lte=end_date)
+    ).values('habit__name', 'date', 'time').order_by('habit__name', 'date', 'time')
+
+    df = pd.DataFrame.from_records(events_data)
+
+    # Modify the type of times if they are of type datetime.time
+    df['time'] = df['time'].apply(convert_time_to_minutes)
+
+    habit_names = df['habit__name'].unique()
+    correlation_values = []
+
+    for habit1 in habit_names:
+        row = []
+        for habit2 in habit_names:
+            habit1_events = df[df['habit__name'] == habit1]['time']
+            habit2_events = df[df['habit__name'] == habit2]['time']
+            min_length = min(len(habit1_events), len(habit2_events))
+            N = min_length
+            habit1_events = habit1_events[:N]
+            habit2_events = habit2_events[:N]
+            correlation = np.corrcoef(habit1_events, habit2_events)[0, 1]
+            row.append(correlation)
+        correlation_values.append(row)
+
+    df = pd.DataFrame(correlation_values, index=habit_names, columns=habit_names)
+
+    context={
+        'df': df.to_html(classes='table table-bordered', index=False),
+    }
+
+    return render(request, 'habits/test.html', context)
+
+
+
 def index(request):
     """
     View for the index page.
@@ -89,16 +130,14 @@ def create_report(request):
         # Call functions to generate charts and handle errors
         success_hourly_chart, hourly_html = generate_hourly_chart(start_date, end_date, habit.id)
         success_daily_chart, daily_html = generate_daily_chart(start_date, end_date, habit.id)
-        success_heatmap, heatmap_html = generate_heat_map(start_date, end_date)
-        success_pie_chart, pie_html = generate_pie_chart(start_date, end_date)
+
 
         # Check if any function call failed and show corresponding messages
-        if not all([success_hourly_chart, success_daily_chart, success_heatmap, success_pie_chart]):
+        if not all([success_hourly_chart, success_daily_chart]):
             error_messages = [message for success, message in [
                 (success_hourly_chart, "Error generating hourly chart."),
                 (success_daily_chart, "Error generating daily chart."),
-                (success_heatmap, "Error generating heatmap."),
-                (success_pie_chart, "Error generating pie chart."),
+
             ] if not success]
 
             for error_message in error_messages:
@@ -110,7 +149,6 @@ def create_report(request):
             date__range=(start_date, end_date)
         )
 
-        # Calcolare l'orario più comune
         total_events = habit_events.count()
         average_events_per_day = total_events / (end_date - start_date).days if total_events > 0 else 0
 
@@ -119,18 +157,13 @@ def create_report(request):
         context = {
             'hourly_html': hourly_html,
             'daily_html': daily_html,
-            'heatmap_html': heatmap_html,
-            'pie_html': pie_html,
             'total_events': total_events,
             'average_events_per_day': round(average_events_per_day, 2),
         }
 
     except Exception as e:
         messages.error(request, f"Error processing data for the create_report view: {str(e)}")
-        context = {
-            'total_events': total_events,
-            'average_events_per_day': round(average_events_per_day, 2),
-        }
+        context = {}
 
     # Render the 'habits/report.html' template with the created context
     return render(request, 'habits/report.html', context)

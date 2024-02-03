@@ -10,6 +10,10 @@
     <div class="container p-2">
         {% include "habits/navbar.html" %}
 
+        <div class="">
+            <a href="{% url 'habits:test' start_date='2024-01-01' end_date='2024-02-03' %}" class="btn btn-custom btn-sm">click me</a>
+        </div>
+
        
         <div class="d-flex flex-row p-2 justify-content-around" >
             <h1 class="flex-grow-1">Overview</h1>

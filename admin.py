@@ -1,11 +1,21 @@
 # admin.py in habits app
 from django.contrib import admin
 from .models import Category, Habit, HabitEvent
+from django.utils.html import format_html
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('name', 'color', 'icon')
+    list_display = ('name', 'colored_background', 'icon')
     search_fields = ['name']
+
+    def colored_background(self, obj):
+        return format_html(
+            '<div style="background-color: {};">{}</div>',
+            obj.color,
+            obj.color
+        )
+    
+    colored_background.short_description = 'Color'
 
 @admin.register(Habit)
 class HabitAdmin(admin.ModelAdmin):

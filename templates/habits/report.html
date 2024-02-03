@@ -7,27 +7,15 @@
 <div class="container p-2">
     {% include "habits/navbar.html" %}
 
+
     <div class="row">
         <div class="col-md-6">
             <h4>Report Information</h4>
             <p>Total Events: {{ total_events }}</p>
             <p>Average Events per Day: {{ average_events_per_day }}</p>
-            <p>Common Hour: {{ common_hour }}:00</p>
         </div>
     </div>
 
-    <div class="row mt-4">
-        <div class="col-md-6">
-            <h4>Pie Chart</h4>
-            <p>Proportion of positive habits in the period</p>
-            {{ pie_html | safe }}
-        </div>
-        <div class="col-md-6">
-            <h4>Heat Map</h4>
-            <p>Correlation among habits in the period</p>
-            {{ heatmap_html | safe }}
-        </div>
-    </div>
 
     <div class="row mt-4">
         <div class="col-md-6">
@@ -35,7 +23,7 @@
             <p>Frequency of the event in the period</p>
             {{ daily_html | safe }}
         </div>
-        <div class="col-md-6">
+        <div class="col-md-6 py-1">
             <h4>Hourly Chart</h4>
             <p>Frequency of the event in the hours</p>
             {{ hourly_html | safe }}
