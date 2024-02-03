@@ -23,7 +23,7 @@ def test(request, start_date, end_date):
     df = pd.DataFrame.from_records(events_data)
 
     # Calcola i minuti da mezzanotte direttamente dalla colonna 'time'
-    #df['minutes_from_midnight'] = df['time'].apply(lambda x: x.hour * 60 + x.minute)
+    df['minutes_from_midnight'] = df['time'].apply(lambda x: x.hour * 60 + x.minute)
 
 
     # habit_names = df['habit__name'].unique()
@@ -48,7 +48,7 @@ def test(request, start_date, end_date):
         'col1':type(df['habit__name'][0]),
         'col2':type(df['date'][0]),
         'col3':type(df['time'][0]),
-        'hour':datetime.strptime(df['time'][0], '%H:%M:%S'),
+        #'hour':datetime.strptime(df['time'][0], '%H:%M:%S'),
         'df': df.to_html(classes='table table-bordered', index=False),
         
 
