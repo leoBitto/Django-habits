@@ -47,11 +47,11 @@ def test(request, start_date, end_date):
     # df = pd.DataFrame(correlation_values, index=habit_names, columns=habit_names)
 
     context={
-        'convert_test_hour':df['time'][0].hour,
-        'convert_test_minute':df['time'][0].minute,
-        'type':type(df['time']),
-        'type_o':df['time'][0],
-        'from_mid':convert_time_to_minutes(df['time'][0]),
+        #'convert_test_hour':df['time'][0].hour,
+        #'convert_test_minute':df['time'][0].minute,
+        #'type':type(df['time']),
+        #'type_o':df['time'][0],
+        #'from_mid':convert_time_to_minutes(df['time'][0]),
         'df': df.to_html(classes='table table-bordered', index=False),
         'test': pd.to_datetime(df['date'][0] + ' ' + df['time'][0])
     }
