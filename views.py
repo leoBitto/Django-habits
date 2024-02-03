@@ -46,7 +46,8 @@ def test(request, start_date, end_date):
     context={
         'convert_test_hour':df['time'][0].hour,
         'convert_test_minute':df['time'][0].minute,
-        'type':type(df['time'][0]),
+        'type':type(df['time']),
+        'type_o':type(df['time'][0]),
         'df': df.to_html(classes='table table-bordered', index=False),
     }
 
