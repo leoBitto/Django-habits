@@ -129,7 +129,11 @@ def create_report(request):
 
     except Exception as e:
         messages.error(request, f"Error processing data for the create_report view: {str(e)}")
-        context = {}
+        context = {
+            'total_events': total_events,
+            'average_events_per_day': round(average_events_per_day, 2),
+            'common_hour':common_hour,
+        }
 
     # Render the 'habits/report.html' template with the created context
     return render(request, 'habits/report.html', context)
