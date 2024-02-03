@@ -50,7 +50,7 @@ def test(request, start_date, end_date):
         #'type_o':df['time'][0],
         #'from_mid':convert_time_to_minutes(df['time'][0]),
         'df': df.to_html(classes='table table-bordered', index=False),
-        'test': pd.to_datetime(df['date'][0] + ' ' + df['time'][0])
+        
     }
 
     return render(request, 'habits/test.html', context)
