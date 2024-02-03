@@ -26,7 +26,7 @@ def test(request, start_date, end_date):
     df['timestamp'] = pd.to_datetime(df['date'] + ' ' + df['time'])
 
     # Calcola i minuti da mezzanotte
-    df['minutes_from_midnight'] = df['timestamp'].dt.hour * 60 + df['timestamp'].dt.minute
+    #df['minutes_from_midnight'] = df['timestamp'].dt.hour * 60 + df['timestamp'].dt.minute
 
     # habit_names = df['habit__name'].unique()
     # correlation_values = []
