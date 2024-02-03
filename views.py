@@ -48,10 +48,10 @@ def test(request, start_date, end_date):
         'col1':type(df['habit__name'][0]),
         'col2':type(df['date'][0]),
         'col3':type(df['time'][0]),
-        'hour':df['time'][0].hour,
-        'minute':df['time'][0].minute,
+        'hour':datetime.strptime(df['time'][0], '%H:%M:%S'),
         'df': df.to_html(classes='table table-bordered', index=False),
         
+
     }
 
     return render(request, 'habits/test.html', context)
