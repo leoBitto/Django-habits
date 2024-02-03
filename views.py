@@ -23,7 +23,7 @@ def test(request, start_date, end_date):
     df = pd.DataFrame.from_records(events_data)
 
     # Modify the type of times if they are of type datetime.time
-    # df['time'] = df['time'].apply(convert_time_to_minutes)
+    df['time'] = df['time'].apply(convert_time_to_minutes)
 
     # habit_names = df['habit__name'].unique()
     # correlation_values = []
