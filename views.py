@@ -35,8 +35,8 @@ def test(request, start_date, end_date):
     for habit1 in habit_names:
         row = []
         for habit2 in habit_names:
-            habit1_events = df[df['habit__name'] == habit1]['time']
-            habit2_events = df[df['habit__name'] == habit2]['time']
+            habit1_events = df[df['habit__name'] == habit1]['minutes_from_midnight']
+            habit2_events = df[df['habit__name'] == habit2]['minutes_from_midnight']
             min_length = min(len(habit1_events), len(habit2_events))
             N = min_length
             habit1_events = habit1_events[:N]
@@ -48,9 +48,7 @@ def test(request, start_date, end_date):
     df = pd.DataFrame(correlation_values, index=habit_names, columns=habit_names)
 
     context={
-        'col1':type(df['habit__name'][0]),
-      
-        'col3':type(df['time'][0]),
+
         #'hour':datetime.strptime(df['time'][0], '%H:%M:%S'),
         'df': df.to_html(classes='table table-bordered', index=False),
         
