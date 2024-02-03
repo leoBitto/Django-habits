@@ -11,46 +11,127 @@ from django.http import JsonResponse
 from .utils import *
 
 def index(request):
-    events_of_today = HabitEvent.objects.filter(date=date.today())
-    events_of_yesterday = HabitEvent.objects.filter(date=date.today() + timedelta(days=-1))
+    """
+    View for the index page.
 
-    # Chiamata alla funzione ausiliaria per creare il grafico a torta
-    pie_chart_html = generate_pie_chart(date.today(), date.today())
+    - Retrieves today's and yesterday's habit events.
+    - Generates a pie chart and heatmap.
+    - Handles errors and displays corresponding messages.
 
-    # Calcola la heatmap delle correlazioni
-    heatmap_html = generate_heat_map(date(2024,1,1), date.today())
+    Args:
+        request: Django HttpRequest object.
 
-    report_form = ReportForm()
+    Returns:
+        Rendered template with the context.
+    """
+    try:
+        # Retrieve today's and yesterday's habit events
+        events_of_today = HabitEvent.objects.filter(date=date.today())
+        events_of_yesterday = HabitEvent.objects.filter(date=date.today() + timedelta(days=-1))
 
-    # Creazione del contesto per il template
-    context = {
-        'habit_event_form': HabitEventForm(),
-        'events_of_today': events_of_today,
-        'events_of_yesterday': events_of_yesterday,
-        'pie_chart_html': pie_chart_html,
-        'heatmap_html': heatmap_html,
-        'report_form': report_form,
-    }
+        # Call the auxiliary function to create the pie chart
+        success_pie_chart, pie_chart_html = generate_pie_chart(date.today(), date.today())
 
-    # Renderizza il template 'habits/index.html' con il contesto creato
+        # Calculate the heatmap of correlations
+        success_heatmap, heatmap_html = generate_heat_map(date(2024, 1, 1), date.today())
+
+        report_form = ReportForm()
+
+        # Check if any function call failed and show corresponding messages
+        if not all([success_heatmap, success_pie_chart]):
+            error_messages = [message for success, message in [
+                (success_heatmap, "Error generating heatmap."),
+                (success_pie_chart, "Error generating pie chart."),
+            ] if not success]
+
+            for error_message in error_messages:
+                messages.warning(request, error_message)
+
+        # Create the context for the template
+        context = {
+            'habit_event_form': HabitEventForm(),
+            'events_of_today': events_of_today,
+            'events_of_yesterday': events_of_yesterday,
+            'pie_chart_html': pie_chart_html,
+            'heatmap_html': heatmap_html,
+            'report_form': report_form,
+        }
+
+    except Exception as e:
+        messages.error(request, f"Error processing data for the index view: {str(e)}")
+        context = {}
+
+    # Render the 'habits/index.html' template with the created context
     return render(request, 'habits/index.html', context)
 
 def create_report(request):
-    if request.method == 'POST':
-        report_form = ReportForm(request.POST)
-        if report_form.is_valid():
-            habit = report_form.cleaned_data['habit']
-            start_date = report_form.cleaned_data['start_date']
-            end_date = report_form.cleaned_data['end_date']
+    """
+    View for creating a habit report.
 
-    context = {
-        'hourly_html':generate_hourly_chart(start_date, end_date, habit.id),
-        'daily_html':generate_daily_chart(start_date, end_date, habit.id),
-        'heatmap_html': generate_heat_map(start_date, end_date),
-        'pie_html': generate_pie_chart(start_date, end_date),
-    }
+    - Retrieves form data for habit, start date, and end date.
+    - Generates hourly and daily charts, pie chart, and heatmap.
+    - Handles errors and displays corresponding messages.
 
-    # Renderizza il template 'habits/index.html' con il contesto creato
+    Args:
+        request: Django HttpRequest object.
+
+    Returns:
+        Rendered template with the context.
+    """
+    try:
+        if request.method == 'POST':
+            report_form = ReportForm(request.POST)
+            if report_form.is_valid():
+                habit = report_form.cleaned_data['habit']
+                start_date = report_form.cleaned_data['start_date']
+                end_date = report_form.cleaned_data['end_date']
+
+        # Call functions to generate charts and handle errors
+        success_hourly_chart, hourly_html = generate_hourly_chart(start_date, end_date, habit.id)
+        success_daily_chart, daily_html = generate_daily_chart(start_date, end_date, habit.id)
+        success_heatmap, heatmap_html = generate_heat_map(start_date, end_date)
+        success_pie_chart, pie_html = generate_pie_chart(start_date, end_date)
+
+        # Check if any function call failed and show corresponding messages
+        if not all([success_hourly_chart, success_daily_chart, success_heatmap, success_pie_chart]):
+            error_messages = [message for success, message in [
+                (success_hourly_chart, "Error generating hourly chart."),
+                (success_daily_chart, "Error generating daily chart."),
+                (success_heatmap, "Error generating heatmap."),
+                (success_pie_chart, "Error generating pie chart."),
+            ] if not success]
+
+            for error_message in error_messages:
+                messages.warning(request, error_message)
+
+        # Ottenere gli HabitEvent associati all'abitudine nel periodo specificato
+        habit_events = HabitEvent.objects.filter(
+            habit=habit,
+            date__range=(start_date, end_date)
+        )
+
+        # Calcolare l'orario più comune
+        common_hour = calculate_common_hour(habit_events)
+        total_events = habit_events.count()
+        average_events_per_day = total_events / (end_date - start_date).days if total_events > 0 else 0
+
+
+        # Create the context for the template
+        context = {
+            'hourly_html': hourly_html,
+            'daily_html': daily_html,
+            'heatmap_html': heatmap_html,
+            'pie_html': pie_html,
+            'total_events': total_events,
+            'average_events_per_day': round(average_events_per_day, 2),
+            'common_hour':common_hour,
+        }
+
+    except Exception as e:
+        messages.error(request, f"Error processing data for the create_report view: {str(e)}")
+        context = {}
+
+    # Render the 'habits/report.html' template with the created context
     return render(request, 'habits/report.html', context)
 
 # category views

@@ -9,26 +9,35 @@
 
     <div class="row">
         <div class="col-md-6">
+            <h4>Report Information</h4>
+            <p>Total Events: {{ total_events }}</p>
+            <p>Average Events per Day: {{ average_events_per_day }}</p>
+            <p>Common Hour: {{ common_hour }}:00</p>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-6">
             <h4>Pie Chart</h4>
-            <p>proportion of positive habits in the period</p>
+            <p>Proportion of positive habits in the period</p>
             {{ pie_html | safe }}
         </div>
         <div class="col-md-6">
             <h4>Heat Map</h4>
-            <p>correlation among habits in the period</p>
+            <p>Correlation among habits in the period</p>
             {{ heatmap_html | safe }}
         </div>
     </div>
 
-    <div class="row">
+    <div class="row mt-4">
         <div class="col-md-6">
             <h4>Daily Chart</h4>
-            <p>frequency of the event in the period</p>
+            <p>Frequency of the event in the period</p>
             {{ daily_html | safe }}
         </div>
         <div class="col-md-6">
             <h4>Hourly Chart</h4>
-            <p>frequency of the event in the hours</p>
+            <p>Frequency of the event in the hours</p>
             {{ hourly_html | safe }}
         </div>
     </div>
