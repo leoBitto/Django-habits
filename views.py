@@ -22,8 +22,11 @@ def test(request, start_date, end_date):
 
     df = pd.DataFrame.from_records(events_data)
 
-    # Modify the type of times if they are of type datetime.time
-    df['from_midnight'] = df['time'].apply(convert_time_to_minutes)
+    # Combina le colonne 'date' e 'time' in una colonna 'timestamp'
+    df['timestamp'] = pd.to_datetime(df['date'] + ' ' + df['time'])
+
+    # Calcola i minuti da mezzanotte
+    df['minutes_from_midnight'] = df['timestamp'].dt.hour * 60 + df['timestamp'].dt.minute
 
     # habit_names = df['habit__name'].unique()
     # correlation_values = []
