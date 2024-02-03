@@ -11,18 +11,6 @@ import plotly.io as pio
 from django.contrib import messages
 
 
-def calculate_common_hour(habit_events):
-    # Crea un DataFrame con i dati degli HabitEvent
-    df = pd.DataFrame(list(habit_events.values('time')))
-
-    # Estrai l'orario dalla colonna 'time'
-    df['hour'] = df['time'].apply(lambda x: x.hour)
-
-    # Calcola l'orario più comune (modalità temporale)
-    common_hour = df['hour'].mode().iloc[0]
-
-    return common_hour
-
 
 def convert_time_to_minutes(time):
     """

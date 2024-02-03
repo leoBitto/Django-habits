@@ -111,7 +111,6 @@ def create_report(request):
         )
 
         # Calcolare l'orario più comune
-        common_hour = calculate_common_hour(habit_events)
         total_events = habit_events.count()
         average_events_per_day = total_events / (end_date - start_date).days if total_events > 0 else 0
 
@@ -124,7 +123,6 @@ def create_report(request):
             'pie_html': pie_html,
             'total_events': total_events,
             'average_events_per_day': round(average_events_per_day, 2),
-            'common_hour':common_hour,
         }
 
     except Exception as e:
@@ -132,7 +130,6 @@ def create_report(request):
         context = {
             'total_events': total_events,
             'average_events_per_day': round(average_events_per_day, 2),
-            'common_hour':common_hour,
         }
 
     # Render the 'habits/report.html' template with the created context
