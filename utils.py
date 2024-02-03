@@ -35,12 +35,15 @@ def generate_heat_map(start_date, end_date):
         # Extract habit events and their times
         events_data = HabitEvent.objects.filter(
             Q(date__gte=start_date) & Q(date__lte=end_date)
-        ).values('habit__name', 'date', 'time').order_by('habit__name', 'date', 'time')
+        ).values('habit__name', 'time').order_by('habit__name', 'time')
 
         df = pd.DataFrame.from_records(events_data)
 
-        # Modify the type of times if they are of type datetime.time
-        df['time'] = df['time'].apply(convert_time_to_minutes)
+        df.dropna(inplace=True)
+
+        # Calcola i minuti da mezzanotte direttamente dalla colonna 'time'
+        df['minutes_from_midnight'] = df['time'].apply(lambda x: x.hour * 60 + x.minute)
+
 
         habit_names = df['habit__name'].unique()
         correlation_values = []
@@ -48,8 +51,8 @@ def generate_heat_map(start_date, end_date):
         for habit1 in habit_names:
             row = []
             for habit2 in habit_names:
-                habit1_events = df[df['habit__name'] == habit1]['time']
-                habit2_events = df[df['habit__name'] == habit2]['time']
+                habit1_events = df[df['habit__name'] == habit1]['minutes_from_midnight']
+                habit2_events = df[df['habit__name'] == habit2]['minutes_from_midnight']
                 min_length = min(len(habit1_events), len(habit2_events))
                 N = min_length
                 habit1_events = habit1_events[:N]

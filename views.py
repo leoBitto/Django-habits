@@ -15,42 +15,14 @@ def test(request, start_date, end_date):
     start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
     end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
 
-    # Extract habit events and their times
-    events_data = HabitEvent.objects.filter(
-        Q(date__gte=start_date) & Q(date__lte=end_date)
-    ).values('habit__name', 'time').order_by('habit__name', 'time')
-
-    df = pd.DataFrame.from_records(events_data)
-
-    df.dropna(inplace=True)
 
 
-    # Calcola i minuti da mezzanotte direttamente dalla colonna 'time'
-    df['minutes_from_midnight'] = df['time'].apply(lambda x: x.hour * 60 + x.minute)
-
-
-    habit_names = df['habit__name'].unique()
-    correlation_values = []
-
-    for habit1 in habit_names:
-        row = []
-        for habit2 in habit_names:
-            habit1_events = df[df['habit__name'] == habit1]['minutes_from_midnight']
-            habit2_events = df[df['habit__name'] == habit2]['minutes_from_midnight']
-            min_length = min(len(habit1_events), len(habit2_events))
-            N = min_length
-            habit1_events = habit1_events[:N]
-            habit2_events = habit2_events[:N]
-            correlation = np.corrcoef(habit1_events, habit2_events)[0, 1]
-            row.append(correlation)
-        correlation_values.append(row)
-
-    df = pd.DataFrame(correlation_values, index=habit_names, columns=habit_names)
+    #df = pd.DataFrame(correlation_values, index=habit_names, columns=habit_names)
 
     context={
 
         #'hour':datetime.strptime(df['time'][0], '%H:%M:%S'),
-        'df': df.to_html(classes='table table-bordered', index=False),
+        #'df': df.to_html(classes='table table-bordered', index=False),
         
 
     }
