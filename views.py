@@ -24,6 +24,8 @@ def test(request, start_date, end_date):
 
     df['time'] = df['time'].replace({'noon': '12:00 p.m.', 'midnight': '12:00 a.m.'})
     df = df[df['time'] != '-']
+    df.dropna(inplace=True)
+
 
     # Calcola i minuti da mezzanotte direttamente dalla colonna 'time'
     #df['minutes_from_midnight'] = df['time'].apply(lambda x: x.hour * 60 + x.minute)
