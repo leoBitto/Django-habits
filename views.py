@@ -23,25 +23,25 @@ def test(request, start_date, end_date):
     df = pd.DataFrame.from_records(events_data)
 
     # Modify the type of times if they are of type datetime.time
-    df['time'] = df['time'].apply(convert_time_to_minutes)
+    # df['time'] = df['time'].apply(convert_time_to_minutes)
 
-    habit_names = df['habit__name'].unique()
-    correlation_values = []
+    # habit_names = df['habit__name'].unique()
+    # correlation_values = []
 
-    for habit1 in habit_names:
-        row = []
-        for habit2 in habit_names:
-            habit1_events = df[df['habit__name'] == habit1]['time']
-            habit2_events = df[df['habit__name'] == habit2]['time']
-            min_length = min(len(habit1_events), len(habit2_events))
-            N = min_length
-            habit1_events = habit1_events[:N]
-            habit2_events = habit2_events[:N]
-            correlation = np.corrcoef(habit1_events, habit2_events)[0, 1]
-            row.append(correlation)
-        correlation_values.append(row)
+    # for habit1 in habit_names:
+    #     row = []
+    #     for habit2 in habit_names:
+    #         habit1_events = df[df['habit__name'] == habit1]['time']
+    #         habit2_events = df[df['habit__name'] == habit2]['time']
+    #         min_length = min(len(habit1_events), len(habit2_events))
+    #         N = min_length
+    #         habit1_events = habit1_events[:N]
+    #         habit2_events = habit2_events[:N]
+    #         correlation = np.corrcoef(habit1_events, habit2_events)[0, 1]
+    #         row.append(correlation)
+    #     correlation_values.append(row)
 
-    df = pd.DataFrame(correlation_values, index=habit_names, columns=habit_names)
+    # df = pd.DataFrame(correlation_values, index=habit_names, columns=habit_names)
 
     context={
         'df': df.to_html(classes='table table-bordered', index=False),
