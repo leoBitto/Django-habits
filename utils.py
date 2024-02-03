@@ -10,8 +10,6 @@ import plotly.graph_objs as go
 import plotly.io as pio
 
 
-
-
 def convert_time_to_minutes(time):
     """
     Convert datetime.time object to minutes from midnight.
@@ -43,7 +41,6 @@ def generate_heat_map(start_date, end_date):
 
         # Calcola i minuti da mezzanotte direttamente dalla colonna 'time'
         df['minutes_from_midnight'] = df['time'].apply(lambda x: x.hour * 60 + x.minute)
-
 
         habit_names = df['habit__name'].unique()
         correlation_values = []
@@ -198,7 +195,7 @@ def generate_hourly_chart(start_date, end_date, habit_id):
             habit_events, 
             columns=['date','time']
         )
-
+        df.dropna(inplace=True)
         df['hour'] = df['time'].apply(lambda x: x.hour)
         df = df.groupby(by=["hour"], as_index=False).count()
         hours_range = list(range(24))

@@ -15,20 +15,9 @@ def test(request, start_date, end_date):
     start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
     end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
 
-
-
-    #df = pd.DataFrame(correlation_values, index=habit_names, columns=habit_names)
-
-    context={
-
-        #'hour':datetime.strptime(df['time'][0], '%H:%M:%S'),
-        #'df': df.to_html(classes='table table-bordered', index=False),
-        
-
-    }
+    context={}
 
     return render(request, 'habits/test.html', context)
-
 
 
 def index(request):
@@ -149,7 +138,6 @@ def create_report(request):
     return render(request, 'habits/report.html', context)
 
 # category views
-
 def category(request):
     categories = Category.objects.all()
 
