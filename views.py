@@ -26,7 +26,7 @@ def test(request, start_date, end_date):
 
 
     # Calcola i minuti da mezzanotte direttamente dalla colonna 'time'
-    #df['minutes_from_midnight'] = df['time'].apply(lambda x: x.hour * 60 + x.minute)
+    df['minutes_from_midnight'] = df['time'].apply(lambda x: x.hour * 60 + x.minute)
 
 
     # habit_names = df['habit__name'].unique()
