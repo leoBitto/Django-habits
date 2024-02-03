@@ -18,13 +18,13 @@ def test(request, start_date, end_date):
     # Extract habit events and their times
     events_data = HabitEvent.objects.filter(
         Q(date__gte=start_date) & Q(date__lte=end_date)
-    ).values('habit__name', 'date', 'time').order_by('habit__name', 'date', 'time')
+    ).values('habit__name', 'time').order_by('habit__name', 'time')
 
     df = pd.DataFrame.from_records(events_data)
 
-    df['time'] = df['time'].replace({'noon': '12:00 p.m.', 'midnight': '12:00 a.m.'})
-    df = df[df['time'] != '-']
-    df.dropna(inplace=True)
+    #df['time'] = df['time'].replace({'noon': '12:00 p.m.', 'midnight': '12:00 a.m.'})
+    #df = df[df['time'] != '-']
+    #df.dropna(inplace=True)
 
 
     # Calcola i minuti da mezzanotte direttamente dalla colonna 'time'
