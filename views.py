@@ -43,14 +43,16 @@ def index(request):
         success_pie_chart, pie_chart_html = generate_pie_chart(date.today(), date.today())
 
         # Calculate the heatmap of correlations
-        success_heatmap, heatmap_html = generate_heat_map(date(2024, 1, 1), date.today())
+        #success_heatmap, heatmap_html = generate_heat_map(date(2024, 1, 1), date.today())
 
         report_form = ReportForm()
 
         # Check if any function call failed and show corresponding messages
-        if not all([success_heatmap, success_pie_chart]):
+        if not all([
+            #success_heatmap, 
+            success_pie_chart]):
             error_messages = [message for success, message in [
-                (success_heatmap, "Error generating heatmap."),
+                #(success_heatmap, "Error generating heatmap."),
                 (success_pie_chart, "Error generating pie chart."),
             ] if not success]
 
@@ -63,7 +65,7 @@ def index(request):
             'events_of_today': events_of_today,
             'events_of_yesterday': events_of_yesterday,
             'pie_chart_html': pie_chart_html,
-            'heatmap_html': heatmap_html,
+            #'heatmap_html': heatmap_html,
             'report_form': report_form,
         }
 

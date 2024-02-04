@@ -189,7 +189,9 @@ def generate_hourly_chart(start_date, end_date, habit_id):
     """
     try:
         habit = Habit.objects.get(pk=habit_id)
-        habit_events = habit.habitevent_set.filter(date__range=(start_date, end_date)).values()
+        habit_events = habit.habitevent_set.filter(
+            Q(date__gte=start_date) & Q(date__lte=end_date)
+        ).values()
 
         df = pd.DataFrame().from_records(
             habit_events, 
