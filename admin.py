@@ -25,9 +25,9 @@ class HabitAdmin(admin.ModelAdmin):
 
 @admin.register(HabitEvent)
 class HabitEventAdmin(admin.ModelAdmin):
-    list_display = ('habit', 'date', 'time')
-    list_filter = ('habit__category', 'date')
-    search_fields = ['habit__name', 'date']
+    list_display = ('habit', 'start_date', 'start_time', 'end_date', 'end_time')
+    list_filter = ('habit__category', 'start_date')
+    search_fields = ['habit__name', 'start_date']
 
     # Aggiungi un campo di ricerca per il nome dell'abitudine
     raw_id_fields = ('habit',)

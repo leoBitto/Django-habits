@@ -24,19 +24,23 @@ class HabitForm(forms.ModelForm):
 class HabitEventForm(forms.ModelForm):
     class Meta:
         model = HabitEvent
-        fields = ['habit', 'date', 'time', ]
+        fields = ['habit', 'start_date', 'start_time', 'end_date', 'end_time']
 
         widgets = {
-            'date': forms.DateInput(attrs={'type': 'date'}, format='%Y-%m-%d'),
-            'time': forms.TimeInput(attrs={'type': 'time'}, format='%H:%M'),
+            'start_date': forms.DateInput(attrs={'type': 'date'}, format='%Y-%m-%d'),
+            'start_time': forms.TimeInput(attrs={'type': 'time'}, format='%H:%M'),
+            'end_date': forms.DateInput(attrs={'type': 'date'}, format='%Y-%m-%d'),
+            'end_time': forms.TimeInput(attrs={'type': 'time'}, format='%H:%M'),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        
+        post_five_mins = datetime.now() + timedelta(minutes=5)
         # Imposta i valori di default per 'date' e 'time' come il momento attuale
-        self.fields['date'].initial = datetime.now().strftime('%Y-%m-%d')
-        self.fields['time'].initial = datetime.now().strftime('%H:%M')
+        self.fields['start_date'].initial = datetime.now().strftime('%Y-%m-%d')
+        self.fields['end_date'].initial = datetime.now().strftime('%Y-%m-%d')
+        self.fields['start_time'].initial = datetime.now().strftime('%H:%M')
+        self.fields['end_time'].initial = post_five_mins.strftime('%H:%M')
 
 
 

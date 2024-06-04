@@ -10,22 +10,13 @@ from django.contrib import messages
 from django.http import JsonResponse
 from .utils import *
 
-def test(request, start_date, end_date):
-        
-    start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
-    end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
-
-    context={}
-
-    return render(request, 'habits/test.html', context)
-
 
 def index(request):
     """
     View for the index page.
 
     - Retrieves today's and yesterday's habit events.
-    - Generates a pie chart and heatmap.
+    - Generates a pie chart 
     - Handles errors and displays corresponding messages.
 
     Args:
@@ -36,8 +27,8 @@ def index(request):
     """
     try:
         # Retrieve today's and yesterday's habit events
-        events_of_today = HabitEvent.objects.filter(date=date.today())
-        events_of_yesterday = HabitEvent.objects.filter(date=date.today() + timedelta(days=-1))
+        events_of_today = HabitEvent.objects.filter(start_date=date.today())
+        events_of_yesterday = HabitEvent.objects.filter(start_date=date.today() + timedelta(days=-1))
 
         # Call the auxiliary function to create the pie chart
         success_pie_chart, pie_chart_html = generate_pie_chart(date.today(), date.today())
@@ -45,12 +36,11 @@ def index(request):
         # Calculate the heatmap of correlations
         #success_heatmap, heatmap_html = generate_heat_map(date(2024, 1, 1), date.today())
 
-        report_form = ReportForm()
-
         # Check if any function call failed and show corresponding messages
         if not all([
             #success_heatmap, 
-            success_pie_chart]):
+            success_pie_chart
+         ]):
             error_messages = [message for success, message in [
                 #(success_heatmap, "Error generating heatmap."),
                 (success_pie_chart, "Error generating pie chart."),
@@ -66,7 +56,7 @@ def index(request):
             'events_of_yesterday': events_of_yesterday,
             'pie_chart_html': pie_chart_html,
             #'heatmap_html': heatmap_html,
-            'report_form': report_form,
+            'report_form': ReportForm(),
         }
 
     except Exception as e:
@@ -314,14 +304,18 @@ def create_habit_event(request):
         
         if form.is_valid():
             habit = form.cleaned_data['habit']
-            date = form.cleaned_data['date']
-            time = form.cleaned_data['time']
+            start_date = form.cleaned_data['start_date']
+            end_date = form.cleaned_data['end_date']
+            start_time = form.cleaned_data['start_time']
+            end_time = form.cleaned_data['end_time']
 
 
             HabitEvent.objects.create(
                 habit=habit,
-                date=date,
-                time=time,
+                start_date=start_date,
+                end_date=end_date,
+                start_time=start_time,
+                end_time=end_time,
 
             )
             messages.success(request, "Event Created.")

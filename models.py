@@ -27,14 +27,17 @@ class Habit(models.Model):
 class HabitEvent(models.Model):
 
     habit = models.ForeignKey(Habit, on_delete=models.CASCADE)
-    date = models.DateField()
-    time = models.TimeField(null=True, blank=True)  # Campo per l'ora, può essere opzionale
-
+    start_date = models.DateField(null=True, blank=True)
+    start_time = models.TimeField(null=True, blank=True)  # Orario di inizio (opzionale)
+    end_date = models.DateField(null=True, blank=True)  # Data di fine (opzionale)
+    end_time = models.TimeField(null=True, blank=True)  # Orario di fine (opzionale)
+    location = models.CharField(max_length=255, blank=True, null=True)  # Luogo dell'evento
+    notes = models.TextField(blank=True, null=True)  # Note aggiuntive
 
     def __str__(self):
-        return f"{self.habit.name} il {self.date}"
+        return f"{self.habit.name} il {self.start_date} alle {self.start_time}"
     
     class Meta:
-        ordering = ['date', 'time']
+        ordering = ['start_date', 'start_time']
 
 

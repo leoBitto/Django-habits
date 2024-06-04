@@ -87,7 +87,7 @@ def generate_pie_chart(start_date, end_date):
     """
     try:
         events = HabitEvent.objects.filter(
-            Q(date__gte=start_date) & Q(date__lte=end_date)
+            Q(start_date__gte=start_date) & Q(end_date__lte=end_date)
         )
 
         total_events = events.count()
@@ -136,7 +136,7 @@ def generate_daily_chart(start_date, end_date, habit_id):
     """
     try:
         habit = Habit.objects.get(pk=habit_id)
-        habit_events = habit.habitevent_set.filter(date__range=(start_date, end_date)).values()
+        habit_events = habit.habitevent_set.filter(start_date__range=(start_date, end_date)).values()
 
         df = pd.DataFrame().from_records(
             habit_events, 
@@ -190,7 +190,7 @@ def generate_hourly_chart(start_date, end_date, habit_id):
     try:
         habit = Habit.objects.get(pk=habit_id)
         habit_events = habit.habitevent_set.filter(
-            Q(date__gte=start_date) & Q(date__lte=end_date)
+            Q(start_date__gte=start_date) & Q(end_date__lte=end_date)
         ).values()
 
         df = pd.DataFrame().from_records(
